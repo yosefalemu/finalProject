@@ -27,30 +27,20 @@ export const Application: CollectionConfig = {
     },
     { name: "houseNumber", type: "text", required: true },
     {
-      name: "responseOfClient",
-      type: "select",
-      defaultValue: "pending",
-      options: [
-        { label: "Pending", value: "pending" },
-        { label: "Approved", value: "approved" },
-        { label: "Rejected", value: "rejected" },
-      ],
-    },
-    {
-      name: "responseOfManager",
-      type: "select",
-      defaultValue: "pending",
-      options: [
-        { label: "Pending", value: "pending" },
-        { label: "Approved", value: "approved" },
-        { label: "Rejected", value: "rejected" },
-      ],
-    },
-    {
       name: "agentLogoUrl",
       type: "array",
       required: true,
       fields: [{ name: "url", type: "text" }],
+    },
+    {
+      name: "statusAgentLogoUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
     },
     {
       name: "profileUrl",
@@ -59,16 +49,46 @@ export const Application: CollectionConfig = {
       fields: [{ name: "url", type: "text" }],
     },
     {
+      name: "statusProfileUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+    {
       name: "nationalIdUrls",
       type: "array",
       required: true,
       fields: [{ name: "url", type: "text" }],
     },
     {
+      name: "statusNationalIdUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+    {
       name: "medicalUrls",
       type: "array",
       required: true,
       fields: [{ name: "url", type: "text" }],
+    },
+    {
+      name: "statusMedicalUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
     },
     // {
     //   name: "footPrintUrl",
@@ -87,6 +107,16 @@ export const Application: CollectionConfig = {
       type: "array",
       required: true,
       fields: [{ name: "url", type: "text" }],
+    },
+    {
+      name: "statusEducationalUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
     },
     // {
     //   name: "tradePermissionUrl",
@@ -143,10 +173,65 @@ export const Application: CollectionConfig = {
       fields: [{ name: "url", type: "text" }],
     },
     {
+      name: "statusUniformDetailUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+    {
       name: "employeeIdUrls",
       type: "array",
       required: true,
       fields: [{ name: "url", type: "text" }],
     },
+    {
+      name: "statusEmployeeIdUrl",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+    {
+      name: "responseOfScreener",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+    {
+      name: "responseOfManager",
+      type: "select",
+      defaultValue: "pending",
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Approved", value: "approved" },
+        { label: "Rejected", value: "rejected" },
+      ],
+    },
+    {
+      name: "selectedScreener",
+      type: "relationship",
+      required: true,
+      relationTo: "users",
+      hasMany: false,
+    },
+    {
+      name: "selectedManager",
+      type: "relationship",
+      required: true,
+      relationTo: "users",
+      hasMany: false,
+    },
+    { name: "rejectedDescriptions", type: "textarea", required: true },
   ],
 };

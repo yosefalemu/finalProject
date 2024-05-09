@@ -238,8 +238,9 @@ const ApplicationMain = () => {
         toast.success("Application is successfully");
         const timeOut = setTimeout(() => {
           router.push("/success-application");
-        }, 4000);
-        clearTimeout(timeOut);
+          router.refresh();
+        }, 2000);
+        return () => clearTimeout(timeOut);
       },
     });
   useEffect(() => {

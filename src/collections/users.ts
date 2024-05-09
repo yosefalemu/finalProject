@@ -64,7 +64,7 @@ export const Users: CollectionConfig = {
         { label: "Admin", value: "admin" },
       ],
     },
-    { name: "Profile", type: "text" },
+    { name: "profile", type: "text" },
     {
       name: "city",
       required: true,
@@ -79,6 +79,12 @@ export const Users: CollectionConfig = {
       name: "kebele",
       required: true,
       type: "text",
+    },
+    {
+      name: "manager",
+      type: "relationship",
+      relationTo: "users",
+      hasMany: false,
     },
   ],
 };

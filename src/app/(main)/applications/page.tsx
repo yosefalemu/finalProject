@@ -19,127 +19,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/trpc/client";
-import { Briefcase, File, FileBadge, Search, ThumbsUp } from "lucide-react";
+import { ReceiptText, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const RegistorAsAgent = () => {
-  const employees = [
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-    {
-      nationalId: "1111 1111 1111 1111",
-      firstName: "Solomon",
-      middleName: "Asregdom",
-      lastName: "Balcha",
-      phoneNumber: "0982010318",
-      status: <ThumbsUp />,
-      agentFile: <File />,
-      agentAdminFile: <FileBadge />,
-      employees: <Briefcase />,
-    },
-  ];
-  const { data: applications } = trpc.screener.getApplication.useInfiniteQuery({
+  const router = useRouter();
+  const { data } = trpc.screener.getApplicationForScreener.useInfiniteQuery({
     limit: 5,
   });
 
-  console.log("APPLICATIONS", applications);
-  const {} = trpc.auth.signInUser.useMutation();
+  console.log("APPLICATIONS", data?.pages[0]);
+  const applications = data?.pages[0].items;
 
   return (
     <div className="p-6 border h-full flex flex-col items-center gap-y-14">
@@ -156,7 +46,7 @@ const RegistorAsAgent = () => {
           className="py-7 px-14 rounded-lg text-lg focus-visible:ring-customColor"
         />
       </div>
-      <div className="w-full">
+      <div className="w-full border border-red-500 h-full flex flex-col justify-between">
         <Table className="w-full">
           <TableCaption>All employees availables are here</TableCaption>
           <TableHeader>
@@ -171,62 +61,83 @@ const RegistorAsAgent = () => {
                 Last Name
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
+                Agent Name
+              </TableHead>
+              <TableHead className="text-lg text-center text-customColor">
+                Gender
+              </TableHead>
+              <TableHead className="text-lg text-center text-customColor">
+                Age
+              </TableHead>
+              <TableHead className="text-lg text-center text-customColor">
                 National Id
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
                 Phone
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
-                Status
+                Email
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
-                Agent File
-              </TableHead>
-              <TableHead className="text-lg text-center text-customColor">
-                Admin File
-              </TableHead>
-              <TableHead className="text-lg text-center text-customColor">
-                Employees
+                Details
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {employees.map((item, index) => (
+            {applications?.map((item, index) => (
               <TableRow
                 key={index}
                 className={`${index % 2 === 0 ? "" : "bg-gray-100"}`}
               >
-                <TableCell>{item.firstName}</TableCell>
-                <TableCell className="text-center text-customColor">
-                  {item.middleName}
+                <TableCell>
+                  {typeof item.applier === "object"
+                    ? item.applier.firstName
+                    : "Not available"}
                 </TableCell>
                 <TableCell className="text-center text-customColor">
-                  {item.lastName}
+                  {typeof item.applier === "object"
+                    ? item.applier.middleName
+                    : "Not available"}
                 </TableCell>
                 <TableCell className="text-center text-customColor">
-                  {item.nationalId}
+                  {typeof item.applier === "object"
+                    ? item.applier.lastName
+                    : "Not available"}
                 </TableCell>
                 <TableCell className="text-center text-customColor">
-                  {item.phoneNumber}
+                  {item.agentName}
+                </TableCell>
+                <TableCell className="text-center text-customColor">
+                  {item.sex}
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center justify-center text-green-600 cursor-pointer">
-                    {item.status}
+                  <div className="flex items-center justify-center text-customColor cursor-pointer">
+                    {item.age}
                   </div>
+                </TableCell>
+                <TableCell className="text-center text-customColor">
+                  {typeof item.applier === "object"
+                    ? item.applier.nationalId
+                    : "Not available"}
+                </TableCell>
+                <TableCell className="text-center text-customColor">
+                  {typeof item.applier === "object"
+                    ? item.applier.phoneNumber
+                    : "Not available"}
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center justify-center text-customColorThree cursor-pointer">
-                    {item.agentFile}
+                  <div className="flex items-center justify-center text-customColor cursor-pointer">
+                    {typeof item.applier === "object"
+                      ? item.applier.email
+                      : "Not available"}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center text-customColorThree  cursor-pointer">
-                    {item.agentAdminFile}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-center text-customColorThree  cursor-pointer">
-                    {item.employees}
+                <TableCell
+                  className="text-right"
+                  onClick={() => router.push(`applications/${item.id}`)}
+                >
+                  <div className="flex items-center justify-center text-green-500 cursor-pointer">
+                    <ReceiptText />
                   </div>
                 </TableCell>
               </TableRow>

@@ -21,7 +21,9 @@ const MainSidebarComponentsItem = ({
               : ""
           }  ${item.role?.includes(role || "") ? "" : "hidden"}`}
           key={index}
-          onClick={() => router.push(item.url.toLowerCase().replace(/\s/g, ""))}
+          onClick={() =>
+            router.push(`/${item.url.toLowerCase().replace(/\s/g, "")}`)
+          }
         >
           <div>
             <item.icon />

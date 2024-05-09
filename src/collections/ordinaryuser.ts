@@ -41,6 +41,7 @@ export const OrdinaryUser: CollectionConfig = {
       required: true,
       type: "text",
     },
+    { name: "profile", type: "text" },
     {
       name: "city",
       required: true,

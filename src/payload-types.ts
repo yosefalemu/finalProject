@@ -29,10 +29,11 @@ export interface User {
   phoneNumber: string;
   sex: 'male' | 'female';
   role: 'screener' | 'manager' | 'admin';
-  Profile?: string | null;
+  profile?: string | null;
   city: string;
   woreda: string;
   kebele: string;
+  manager?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -57,6 +58,7 @@ export interface OrdinaryUser {
   lastName: string;
   nationalId: string;
   phoneNumber: string;
+  profile?: string | null;
   city: string;
   woreda: string;
   kebele: string;
@@ -85,36 +87,46 @@ export interface Application {
   age: string;
   sex: 'male' | 'female';
   houseNumber: string;
-  responseOfClient?: ('pending' | 'approved' | 'rejected') | null;
-  responseOfManager?: ('pending' | 'approved' | 'rejected') | null;
   agentLogoUrl: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusAgentLogoUrl?: ('pending' | 'approved' | 'rejected') | null;
   profileUrl: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusProfileUrl?: ('pending' | 'approved' | 'rejected') | null;
   nationalIdUrls: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusNationalIdUrl?: ('pending' | 'approved' | 'rejected') | null;
   medicalUrls: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusMedicalUrl?: ('pending' | 'approved' | 'rejected') | null;
   educationalUrls: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusEducationalUrl?: ('pending' | 'approved' | 'rejected') | null;
   uniformDetailsUrls: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusUniformDetailUrl?: ('pending' | 'approved' | 'rejected') | null;
   employeeIdUrls: {
     url?: string | null;
     id?: string | null;
   }[];
+  statusEmployeeIdUrl?: ('pending' | 'approved' | 'rejected') | null;
+  responseOfScreener?: ('pending' | 'approved' | 'rejected') | null;
+  responseOfManager?: ('pending' | 'approved' | 'rejected') | null;
+  selectedScreener: string | User;
+  selectedManager: string | User;
+  rejectedDescriptions?: string | null;
   updatedAt: string;
   createdAt: string;
 }
