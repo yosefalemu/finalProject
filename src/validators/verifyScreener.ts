@@ -20,7 +20,12 @@ export type TVerifyApplicationByScreener = z.infer<
 
 export const RejectApplicationByScreener = z.object({
   applicationId: z.string(),
-  rejectedDescriptions: z.string(),
+  rejectedDescriptions: z
+    .string()
+    .min(10, {
+      message:
+        "Please provide specific details regarding the reasons for the rejection.",
+    }),
 });
 
 export type TRejectApplicationByScreener = z.infer<

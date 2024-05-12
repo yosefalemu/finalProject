@@ -1,3 +1,4 @@
+"use client";
 import { Bell } from "lucide-react";
 import {
   Sheet,
@@ -8,29 +9,125 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import Image from "next/image";
+import { trpc } from "@/trpc/client";
+import { Application, User } from "@/payload-types";
+import { truncateText } from "@/lib/utils";
+import TimeAgo from "timeago-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useNavbarRefresh } from "@/hooks/navbarRefresh";
+
 const Notification = () => {
-  const itemCount = 8;
+  const { changeState } = useNavbarRefresh();
+  const { data: notificationsFound } =
+    trpc.ordinaryNotification.getUserNotifications.useQuery();
+
+  const { mutate } = trpc.ordinaryNotification.updateView.useMutation({
+    onSuccess: (data) => {
+      changeState();
+    },
+  });
+
+  const getDetailNotification = (notificationId: string) => {
+    console.log("application id sent", notificationId);
+    mutate({ notificationId });
+  };
+
   return (
     <Sheet>
       <SheetTrigger className="group flex items-center -ml-2 p-2 relative">
         <Bell className="h-6 w-6 flex-shrink-0 text-customColor group-hover:text-gray-400" />
-        {itemCount > 0 && (
+        {notificationsFound?.unseen! > 0 && (
           <span className="h-5 w-5 flex items-center justify-center bg-customColor p-3 absolute -top-1 -right-[25%] text-xs font-medium text-white rounded-full">
-            {itemCount}
+            {notificationsFound?.unseen!}
           </span>
         )}
       </SheetTrigger>
-      <SheetContent className="flex w-[600px] flex-col pr-0 sm:max-w-lg">
+      <SheetContent className="flex w-[600px] flex-col pr-0 sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle className="text-customColor">
+          <SheetTitle className="text-customColor font-normal text-xl">
             {" "}
-            {itemCount > 0
-              ? `You have ${itemCount} new notifications`
-              : "You have't notifications"}
+            {notificationsFound?.unseen! > 0
+              ? `You have ${notificationsFound?.unseen} new notifications`
+              : "You have't new notifications"}
           </SheetTitle>
         </SheetHeader>
-        {itemCount > 0 ? (
-          <div>MAIN NOTIFICATION CONTENT WILL BE HERE</div>
+        {notificationsFound?.notification.length! > 0 ? (
+          <div className="mt-2 h-full overflow-y-scroll">
+            <Accordion type="single" collapsible className="w-full">
+              {notificationsFound?.notification.map((item, index) => {
+                const application = item.application as Application;
+                return (
+                  <AccordionItem
+                    value={`item-${index}`}
+                    className="w-full"
+                    key={index}
+                  >
+                    <AccordionTrigger
+                      className="no-underline hover:no-underline w-full"
+                      onClick={() => {
+                        getDetailNotification(item.id);
+                      }}
+                    >
+                      <div className="flex items-center h-[100px] bg-gray-100 gap-x-2 pr-4 rounded-sm py-2 w-full">
+                        <div className="relative h-24 w-24 rounded-full">
+                          <Image
+                            fill
+                            src={"/mainImages/logo.png"}
+                            alt="PROFILE PICTURE"
+                            className="absolute object-contain"
+                          />
+                        </div>
+                        <div className="flex-1 relative h-full">
+                          <div className="flex items-center gap-x-2">
+                            {application.responseOfScreener === "rejected" ? (
+                              <h1 className="text-red-500 text-lg">
+                                Rejection of application
+                              </h1>
+                            ) : (
+                              <h1>Acceptance of appliction</h1>
+                            )}
+                          </div>
+
+                          <p className="text-start">
+                            {truncateText(item.message)}
+                          </p>
+                          <div className="absolute right-0 bottom-0">
+                            <TimeAgo datetime={item.createdAt} />
+                          </div>
+                          {item.isViewed === "unseen" && (
+                            <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-sm rounded-sm">
+                              New
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-col gap-y-2">
+                        <p className="text-lg">{item.message}</p>
+                        {application.responseOfScreener === "rejected" && (
+                          <Button
+                            className="text-white decoration-white w-1/4"
+                            variant={"default"}
+                          >
+                            Reapply
+                          </Button>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center space-y-4">
             <div
@@ -41,10 +138,13 @@ const Notification = () => {
                 src="/mainImages/emptyNotification.png"
                 fill
                 alt="empty shopping cart hippo"
+                className="object-contain"
               />
             </div>
-            <div className="text-xl font-semibold">
-              Your Have't notifications
+            <div>
+              <p className="text-lg font-normal text-customColor">
+                Oops! nothing here!
+              </p>
             </div>
           </div>
         )}

@@ -1,9 +1,18 @@
+"use client";
 import Image from "next/image";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import Notification from "./Notification";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useNavbarRefresh } from "@/hooks/navbarRefresh";
 
 const MainNavBar = () => {
+  const { state } = useNavbarRefresh();
+  console.log("NAVBAR", state);
+
+  useEffect(() => {}, [state]);
+  console.log("NAVBAR");
+
   return (
     <div className="sticky bg-white h-20 top-0 z-50 inset-x-0 border-b-2 border-gray-400">
       <MaxWidthWrapper className="md:px-0">

@@ -1,4 +1,12 @@
 "use client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -19,7 +27,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { trpc } from "@/trpc/client";
-import { ReceiptText, Search } from "lucide-react";
+import {
+  CircleEllipsis,
+  ReceiptText,
+  Search,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const RegistorAsAgent = () => {
@@ -76,7 +90,10 @@ const RegistorAsAgent = () => {
                 Phone
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
-                Email
+                Status
+              </TableHead>
+              <TableHead className="text-lg text-center text-customColor">
+                Manager Status
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
                 Details
@@ -125,11 +142,39 @@ const RegistorAsAgent = () => {
                     ? item.applier.phoneNumber
                     : "Not available"}
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center text-customColor cursor-pointer">
-                    {typeof item.applier === "object"
-                      ? item.applier.email
-                      : "Not available"}
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-center">
+                    {item.responseOfScreener === "pending" ? (
+                      <CircleEllipsis className="text-orange-300" />
+                    ) : item.responseOfManager === "approved" ? (
+                      <ThumbsUp className=" text-green-500" />
+                    ) : null}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-center text-green-500 cursor-pointer">
+                    {item.responseOfManager === "pending" ? (
+                      <CircleEllipsis className="text-orange-300" />
+                    ) : item.responseOfManager === "rejected" ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <ThumbsDown className=" text-red-600" />
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[785px]">
+                          <DialogHeader>
+                            <DialogDescription className="font-normal text-customColor text-lg mt-4">
+                              Application has been declined for the following
+                              reasons. If you have any questions or concerns,
+                              please don't hesitate to reach out to us for
+                              clarification.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="py-4">
+                            {item.rejectedDescriptions}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    ) : null}
                   </div>
                 </TableCell>
                 <TableCell

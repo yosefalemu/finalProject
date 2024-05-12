@@ -11,6 +11,7 @@ export interface Config {
     users: User;
     ordinaryUser: OrdinaryUser;
     applications: Application;
+    ordinaryNotification: OrdinaryNotification;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -127,6 +128,20 @@ export interface Application {
   selectedScreener: string | User;
   selectedManager: string | User;
   rejectedDescriptions?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ordinaryNotification".
+ */
+export interface OrdinaryNotification {
+  id: string;
+  reciever: string | OrdinaryUser;
+  sender: string | User;
+  application: string | Application;
+  message: string;
+  isViewed?: ('unseen' | 'seen') | null;
   updatedAt: string;
   createdAt: string;
 }

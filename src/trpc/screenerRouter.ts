@@ -2,6 +2,7 @@ import { getPayloadClient } from "../get-payload";
 import { privateProcedure, router } from "./trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { OrdinaryUser } from "@/payload-types";
 
 export const screenerRouter = router({
   getApplicationForScreener: privateProcedure
@@ -276,7 +277,8 @@ export const screenerRouter = router({
     .input(
       z.object({ applicationId: z.string(), rejectedDescriptions: z.string() })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const { user } = ctx;
       const { applicationId, rejectedDescriptions } = input;
       const payload = await getPayloadClient();
       const applicationFound = await payload.findByID({
@@ -318,13 +320,28 @@ export const screenerRouter = router({
           code: "BAD_REQUEST",
           message: "Uniform detail is not validate yet!",
         });
+      } else if (applicationFound.responseOfScreener === "rejected") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Application is already rejected!",
+        });
       } else {
         await payload.update({
           collection: "applications",
           id: applicationId,
           data: {
             responseOfScreener: "rejected",
-            rejectedDescriptions: rejectedDescriptions,
+          },
+        });
+        const applier = applicationFound.applier as OrdinaryUser;
+        console.log("APPLIER", applier);
+        await payload.create({
+          collection: "ordinaryNotification",
+          data: {
+            application: applicationId,
+            reciever: applier.id,
+            sender: user.id,
+            message: rejectedDescriptions,
           },
         });
       }

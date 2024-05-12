@@ -18,9 +18,12 @@ import {
   TVerifyApplicationByScreener,
   TVerifyIndividualsApplicationByScreener,
   TRejectApplicationByScreener,
+  RejectApplicationByScreener,
 } from "@/validators/verifyScreener";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const ApplicationDetail = ({
   params,
@@ -32,7 +35,6 @@ const ApplicationDetail = ({
   const [verificationStatus, setVerificationStatus] = useState<boolean | null>(
     null
   );
-  const [rejectedDescriptions, setRejectedDescriptions] = useState<string>("");
 
   const { data, isLoading, isError } =
     trpc.screener.getSingleApplication.useQuery({
@@ -99,7 +101,22 @@ const ApplicationDetail = ({
     approveByScreener({ applicationId });
   };
   // REJECT APPLICATION
-  const { mutate: rejectByScreener } =
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    setValue,
+    formState: { errors },
+  } = useForm<TRejectApplicationByScreener>({
+    resolver: zodResolver(RejectApplicationByScreener),
+  });
+  const handleInputChange = (fieldName: string) => {
+    clearErrors(fieldName as keyof TRejectApplicationByScreener);
+  };
+  useEffect(() => {
+    setValue("applicationId", params.applicationId);
+  }, []);
+  const { mutate: rejectByScreener, isLoading: isLoaingForRejection } =
     trpc.screener.rejectByScreener.useMutation({
       onSuccess: () => {
         toast.success("Application is rejected successfully");
@@ -682,39 +699,45 @@ const ApplicationDetail = ({
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-fit h-fit p-4 flex flex-col">
-              <div className="w-[800px] flex flex-col gap-y-4">
-                <Label htmlFor="message" className="text-2xl text-customColor">
-                  Type your reason
-                </Label>
-                <Textarea
-                  placeholder="Type reject reason"
-                  id="message"
-                  rows={15}
-                  onChange={(e) => setRejectedDescriptions(e.target.value)}
-                />
-              </div>
-
-              <DialogFooter className="pt-5 flex items-center justify-center">
-                <Button
-                  type="button"
-                  className="px-10 bg-red-600 hover:bg-red-800"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  className="px-10"
-                  onClick={() => {
-                    rejectApplication({
-                      applicationId: params.applicationId,
-                      rejectedDescriptions: rejectedDescriptions,
-                    });
-                  }}
-                  disabled={isLoadingApproveByScreener}
-                >
-                  Reject
-                </Button>
-              </DialogFooter>
+              <form onSubmit={handleSubmit(rejectApplication)}>
+                <div className="w-[800px] flex flex-col gap-y-4">
+                  <Label
+                    htmlFor="message"
+                    className="font-normal text-customColor text-lg mt-4"
+                  >
+                    Type your reasons for the rejection
+                  </Label>
+                  <Textarea
+                    placeholder="Type reject reason"
+                    id="message"
+                    rows={15}
+                    {...register("rejectedDescriptions")}
+                    className="focus-visible:ring-0"
+                    onChange={() => handleInputChange("rejectedDescriptions")}
+                  />
+                  {errors.rejectedDescriptions && (
+                    <p className="text-red-500">
+                      {errors.rejectedDescriptions.message}
+                    </p>
+                  )}
+                </div>
+                <DialogFooter className="pt-5 flex items-center justify-center">
+                  <Button
+                    type="button"
+                    className="px-10 bg-red-600 hover:bg-red-800"
+                    disabled={isLoaingForRejection}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="px-10"
+                    disabled={isLoaingForRejection}
+                  >
+                    Reject
+                  </Button>
+                </DialogFooter>
+              </form>
             </DialogContent>
           </Dialog>
           <Dialog>
@@ -731,6 +754,7 @@ const ApplicationDetail = ({
                 <Button
                   type="button"
                   className="px-10 bg-red-600 hover:bg-red-800"
+                  disabled={isLoadingApproveByScreener}
                 >
                   Cancel
                 </Button>

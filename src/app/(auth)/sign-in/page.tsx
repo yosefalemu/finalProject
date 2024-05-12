@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,6 @@ import { ArrowRight, Eye, EyeOff, Mail, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { trpc } from "@/trpc/client";
 import {
   SignInCredentialValidator,
@@ -101,10 +100,6 @@ const SignIn = () => {
   });
 
   const onSubmit = ({ email, password }: TSignInCredentialValidator) => {
-    console.log("ERRORS HAPPEN", errors);
-    console.log("WORKED", email);
-    console.log("WORKED", password);
-
     setUrl(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/nationalid-verify?email=${email}`
     );

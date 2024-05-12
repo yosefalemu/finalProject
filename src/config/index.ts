@@ -8,7 +8,6 @@ import {
   Users,
   MessageSquareMore,
   ShieldPlus,
-  MessageSquareText,
   ScrollText,
 } from "lucide-react";
 
@@ -45,7 +44,6 @@ export const MainSidebarComponents: TSidebarItemsType[] = [
 
 export const SidebarComponents: TSidebarItemsType[] = [
   { name: "Home", url: "Ordinary User Home", icon: Home },
-  { name: "Messages", url: "Messages", icon: MessageSquareText },
   { name: "Apply Instructions", url: "ApplyInstructions", icon: ScrollText },
   { name: "Apply", url: "ApplyMain", icon: ShieldPlus },
 ];
