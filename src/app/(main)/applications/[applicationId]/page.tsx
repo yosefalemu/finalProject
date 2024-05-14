@@ -19,11 +19,13 @@ import {
   TVerifyIndividualsApplicationByScreener,
   TRejectApplicationByScreener,
   RejectApplicationByScreener,
+  VerifyIndividualsApplicationByScreener,
 } from "@/validators/verifyScreener";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import PdfViewer from "@/components/Pdfreader";
 
 const ApplicationDetail = ({
   params,
@@ -43,29 +45,14 @@ const ApplicationDetail = ({
 
   console.log("APPLICATION FOUND", data);
 
-  const validAgentLogoUrl = data?.agentLogoUrl
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
-
-  const validProfileUrl = data?.profileUrl
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
-  const validNationalIdUrl = data?.nationalIdUrls
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
-  const validMedicalUrl = data?.medicalUrls
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
-  const validEducationUrl = data?.educationalUrls
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
-  const validEmployeeIdUrl = data?.employeeIdUrls
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
-  const validUniformDetailsUrl = data?.uniformDetailsUrls
-    .map(({ url }) => url)
-    .filter(Boolean) as string[];
   //VERIFY INDIVIDUAL ITEMS
+  const {
+    register: registerVerify,
+    reset,
+    watch,
+  } = useForm<TVerifyIndividualsApplicationByScreener>({
+    resolver: zodResolver(VerifyIndividualsApplicationByScreener),
+  });
   const { mutate: verifyIndividuals, isLoading: isLoadingVerify } =
     trpc.screener.verifyIndividualsByScreener.useMutation({
       onSuccess: () => {
@@ -74,16 +61,17 @@ const ApplicationDetail = ({
             verificationStatus ? "verified" : "rejected"
           } successfully`
         );
+        reset({ message: "" });
       },
       onError: () => {},
     });
-
   const verifyByScreener = ({
     controller,
     approved,
     applicationId,
+    message,
   }: TVerifyIndividualsApplicationByScreener) => {
-    verifyIndividuals({ controller, approved, applicationId });
+    verifyIndividuals({ controller, approved, applicationId, message });
   };
   //VERIFY APPLICATION
   const { isLoading: isLoadingApproveByScreener, mutate: approveByScreener } =
@@ -127,11 +115,9 @@ const ApplicationDetail = ({
     });
   const rejectApplication = ({
     applicationId,
-    rejectedDescriptions,
   }: TRejectApplicationByScreener) => {
     rejectByScreener({
       applicationId,
-      rejectedDescriptions,
     });
   };
 
@@ -299,7 +285,7 @@ const ApplicationDetail = ({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
                       Agent Logo
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
@@ -308,8 +294,27 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validAgentLogoUrl} />
+                    <PdfViewer fileUrl={data?.agentLogoUrl!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject Agent Logo
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -319,13 +324,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "agentLogoUrl",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
                         setCurrentVerification("Agent Logo is");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -349,7 +375,7 @@ const ApplicationDetail = ({
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">
-                Profile Picture
+                Profile picture
               </h1>
               <Dialog>
                 <DialogTrigger asChild>
@@ -357,17 +383,36 @@ const ApplicationDetail = ({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
-                      Profile Picture
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Profile picture
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      View the applicant profile carefefully and verify if it is
+                      View the profile picture carefefully and verify if it is
                       correct
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validProfileUrl} />
+                    <PdfViewer fileUrl={data?.profileUrl!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject Profile Picture
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -377,13 +422,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "profileUrl",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
                         setCurrentVerification("Profile picture is");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -413,17 +479,36 @@ const ApplicationDetail = ({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
                       National Id
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      View the applicant national id carefefully and verify if
-                      it is correct
+                      View the national id carefefully and verify if it is
+                      correct
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validNationalIdUrl} />
+                    <PdfViewer fileUrl={data?.nationalIdUrls!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject National id
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -433,13 +518,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "nationalIdUrls",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
                         setCurrentVerification("National id is");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -463,7 +569,7 @@ const ApplicationDetail = ({
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">
-                Educational Files
+                Educational files
               </h1>
               <Dialog>
                 <DialogTrigger asChild>
@@ -471,17 +577,36 @@ const ApplicationDetail = ({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
-                      Educational Files
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Educational files
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      View the applicant educational files carefefully and
-                      verify if it is correct
+                      View the educational files carefefully and verify if it is
+                      correct
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validEducationUrl} />
+                    <PdfViewer fileUrl={data?.educationalUrls!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject Educational files
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -491,13 +616,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "educationalUrls",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
                         setCurrentVerification("Educational files are");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -520,24 +666,43 @@ const ApplicationDetail = ({
               </Dialog>
             </div>
             <div className="flex items-center gap-x-4">
-              <h1 className="flex-1 text-customColor text-xl">Medical Files</h1>
+              <h1 className="flex-1 text-customColor text-xl">Medical files</h1>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline">View details</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
-                      Medical Files
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Medical files
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      View the applicant medical files carefefully and verify if
-                      it is correct
+                      View the medical files carefefully and verify if it is
+                      correct
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validMedicalUrl} />
+                    <PdfViewer fileUrl={data?.medicalUrls!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject Medical Files
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -547,13 +712,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "medicalUrls",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
                         setCurrentVerification("Medical files are");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -583,17 +769,36 @@ const ApplicationDetail = ({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
                       Employee Id
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      View the applicant employee Id carefefully and verify if
-                      it is correct
+                      View the employee id carefefully and verify if it is
+                      correct
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validEmployeeIdUrl} />
+                    <PdfViewer fileUrl={data?.employeeIdUrls!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject Employee Id
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -603,13 +808,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "employeeIdUrls",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
-                        setCurrentVerification("Employees id are");
+                        setCurrentVerification("Employee id is");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -621,7 +847,7 @@ const ApplicationDetail = ({
                           applicationId: params.applicationId,
                         });
                         setVerificationStatus(true);
-                        setCurrentVerification("Employees id are");
+                        setCurrentVerification("Employee id is");
                       }}
                       disabled={isLoadingVerify}
                     >
@@ -641,17 +867,36 @@ const ApplicationDetail = ({
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[750px] flex flex-col">
                   <DialogHeader>
-                    <DialogTitle className="text-3xl text-customColor text-center font-normal">
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
                       Uniform Details
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      View the applicant uniform Details carefefully and verify
-                      if it is correct
+                      View the uniform details carefefully and verify if it is
+                      correct
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex-1 overflow-hidden">
-                    <ImageSlider validImageUrl={validUniformDetailsUrl} />
+                    <PdfViewer fileUrl={data?.uniformDetailsUrls!} />
                   </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Reject</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[750px] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Reject Uniform Detail
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Provide clear reason for the rejection
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Textarea
+                    {...registerVerify("message")}
+                    placeholder="Type reject reason or approval message"
+                  />
                   <DialogFooter className="pt-5">
                     <Button
                       type="button"
@@ -661,13 +906,34 @@ const ApplicationDetail = ({
                           approved: false,
                           controller: "uniformDetailsUrls",
                           applicationId: params.applicationId,
+                          message: watch("message"),
                         });
                         setVerificationStatus(false);
-                        setCurrentVerification("Uniform details are");
+                        setCurrentVerification("Uniform detail is");
                       }}
                       disabled={isLoadingVerify}
                     >
-                      Reject
+                      Confirm
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Verify</Button>
+                </DialogTrigger>
+                <DialogContent className="w-fit flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl text-customColor text-center font-semibold">
+                      Are you sure?
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogFooter className="pt-5">
+                    <Button
+                      type="button"
+                      className="px-10 bg-red-600 hover:bg-red-800"
+                    >
+                      Cancel
                     </Button>
                     <Button
                       type="button"
@@ -679,7 +945,7 @@ const ApplicationDetail = ({
                           applicationId: params.applicationId,
                         });
                         setVerificationStatus(true);
-                        setCurrentVerification("Uniform details are");
+                        setCurrentVerification("Uniform detail  is");
                       }}
                       disabled={isLoadingVerify}
                     >
@@ -699,45 +965,30 @@ const ApplicationDetail = ({
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-fit h-fit p-4 flex flex-col">
-              <form onSubmit={handleSubmit(rejectApplication)}>
-                <div className="w-[800px] flex flex-col gap-y-4">
-                  <Label
-                    htmlFor="message"
-                    className="font-normal text-customColor text-lg mt-4"
-                  >
-                    Type your reasons for the rejection
-                  </Label>
-                  <Textarea
-                    placeholder="Type reject reason"
-                    id="message"
-                    rows={15}
-                    {...register("rejectedDescriptions")}
-                    className="focus-visible:ring-0"
-                    onChange={() => handleInputChange("rejectedDescriptions")}
-                  />
-                  {errors.rejectedDescriptions && (
-                    <p className="text-red-500">
-                      {errors.rejectedDescriptions.message}
-                    </p>
-                  )}
-                </div>
-                <DialogFooter className="pt-5 flex items-center justify-center">
-                  <Button
-                    type="button"
-                    className="px-10 bg-red-600 hover:bg-red-800"
-                    disabled={isLoaingForRejection}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="px-10"
-                    disabled={isLoaingForRejection}
-                  >
-                    Reject
-                  </Button>
-                </DialogFooter>
-              </form>
+              <DialogHeader>
+                <DialogDescription className="text-center text-lg">
+                  Are you sure?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="pt-5 flex items-center justify-center">
+                <Button
+                  type="button"
+                  className="px-10 bg-red-600 hover:bg-red-800"
+                  disabled={isLoaingForRejection}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="px-10"
+                  onClick={() =>
+                    rejectApplication({ applicationId: params.applicationId })
+                  }
+                  disabled={isLoaingForRejection}
+                >
+                  Reject
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
           <Dialog>

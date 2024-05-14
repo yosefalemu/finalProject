@@ -22,31 +22,21 @@ export const ApplicationValidators = z.object({
         });
       }
     }),
-  sex: z.enum(["male", "female"]),
+  sex: z
+    .string()
+    .min(1, { message: "Sex is required" })
+    .transform((val) => val.toLowerCase())
+    .refine((val) => ["male", "female"].includes(val), {
+      message: "Sex must be either 'male' or 'female'",
+    }),
   houseNumber: z
     .string()
     .min(1, { message: "House number is required" })
     .regex(/^\d+$/, { message: "Please enter valid house number" }),
-  agentLogoUrl: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
-  profileUrl: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
-  nationalIdUrls: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
-  medicalUrls: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
+  agentLogoUrl: z.string().min(1, { message: "agent logo is required" }),
+  profileUrl: z.string().min(1, { message: "Profile picture is required" }),
+  nationalIdUrls: z.string().min(1, { message: "National id is required" }),
+  medicalUrls: z.string().min(1, { message: "Medical files is required" }),
   // footPrintUrl: z.array(
   //   z.object({
   //     url: z.string().url(),
@@ -57,11 +47,9 @@ export const ApplicationValidators = z.object({
   //     url: z.string().url(),
   //   })
   // ),
-  educationalUrls: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
+  educationalUrls: z
+    .string()
+    .min(1, { message: "Educational files are required" }),
   // tradePermissionUrl: z.array(
   //   z.object({
   //     url: z.string().url(),
@@ -102,16 +90,10 @@ export const ApplicationValidators = z.object({
   //     url: z.string().url(),
   //   })
   // ),
-  uniformDetailsUrls: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
-  employeeIdUrls: z.array(
-    z.object({
-      url: z.string().url(),
-    })
-  ),
+  uniformDetailsUrls: z
+    .string()
+    .min(1, { message: "Uniform detail is required" }),
+  employeeIdUrls: z.string().min(1, { message: "Employee id is required" }),
 });
 
 export type TApplicationValidator = z.infer<typeof ApplicationValidators>;

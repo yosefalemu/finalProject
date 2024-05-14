@@ -75,10 +75,11 @@ export const screenerRouter = router({
         controller: z.string(),
         applicationId: z.string(),
         approved: z.boolean(),
+        message: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      const { applicationId, controller, approved } = input;
+      const { applicationId, controller, approved, message } = input;
       const payload = await getPayloadClient();
       //UPDATE FOR THE AGENT URL
       if (controller === "agentLogoUrl") {
@@ -88,6 +89,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusAgentLogoUrl: "approved",
+              agentLogoRejectionReason: "",
             },
           });
         } else {
@@ -96,6 +98,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusAgentLogoUrl: "rejected",
+              agentLogoRejectionReason: message,
             },
           });
         }
@@ -108,6 +111,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusProfileUrl: "approved",
+              profilePictureRejectionReason: "",
             },
           });
         } else {
@@ -116,6 +120,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusProfileUrl: "rejected",
+              profilePictureRejectionReason: message,
             },
           });
         }
@@ -128,6 +133,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusNationalIdUrl: "approved",
+              nationalIdRejectionReason: "",
             },
           });
         } else {
@@ -136,6 +142,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusNationalIdUrl: "rejected",
+              nationalIdRejectionReason: message,
             },
           });
         }
@@ -148,6 +155,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusMedicalUrl: "approved",
+              medicalFilesRejectionReason: "",
             },
           });
         } else {
@@ -156,6 +164,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusMedicalUrl: "rejected",
+              medicalFilesRejectionReason: message,
             },
           });
         }
@@ -168,6 +177,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusEducationalUrl: "approved",
+              educationalFilesRejectionReason: "",
             },
           });
         } else {
@@ -176,6 +186,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusEducationalUrl: "rejected",
+              educationalFilesRejectionReason: message,
             },
           });
         }
@@ -188,6 +199,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusUniformDetailUrl: "approved",
+              uniformDetailRejectionReason: "",
             },
           });
         } else {
@@ -196,6 +208,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusUniformDetailUrl: "rejected",
+              uniformDetailRejectionReason: message,
             },
           });
         }
@@ -208,6 +221,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusEmployeeIdUrl: "approved",
+              employeeIdRejectionReason: "",
             },
           });
         } else {
@@ -216,6 +230,7 @@ export const screenerRouter = router({
             id: applicationId,
             data: {
               statusEmployeeIdUrl: "rejected",
+              employeeIdRejectionReason: message,
             },
           });
         }
@@ -274,12 +289,10 @@ export const screenerRouter = router({
       }
     }),
   rejectByScreener: privateProcedure
-    .input(
-      z.object({ applicationId: z.string(), rejectedDescriptions: z.string() })
-    )
+    .input(z.object({ applicationId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const { user } = ctx;
-      const { applicationId, rejectedDescriptions } = input;
+      const { applicationId } = input;
       const payload = await getPayloadClient();
       const applicationFound = await payload.findByID({
         collection: "applications",
@@ -341,7 +354,7 @@ export const screenerRouter = router({
             application: applicationId,
             reciever: applier.id,
             sender: user.id,
-            message: rejectedDescriptions,
+            message: "Rejection of your application",
           },
         });
       }

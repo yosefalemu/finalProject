@@ -10,8 +10,7 @@ import {
 } from "./ui/sheet";
 import Image from "next/image";
 import { trpc } from "@/trpc/client";
-import { Application, User } from "@/payload-types";
-import { truncateText } from "@/lib/utils";
+import { useState } from "react";
 import TimeAgo from "timeago-react";
 import {
   Accordion,
@@ -20,32 +19,33 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import { Button } from "./ui/button";
+import { truncateText } from "@/lib/utils";
+import { Application } from "@/payload-types";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useNavbarRefresh } from "@/hooks/navbarRefresh";
 
 const Notification = () => {
-  const { changeState } = useNavbarRefresh();
-  const { data: notificationsFound } =
+  const router = useRouter();
+  const [viewedItems, setViewedItems] = useState(new Set());
+  const { data: notificationsFound, refetch } =
     trpc.ordinaryNotification.getUserNotifications.useQuery();
 
   const { mutate } = trpc.ordinaryNotification.updateView.useMutation({
-    onSuccess: (data) => {
-      changeState();
+    onSuccess: () => {
+      refetch();
     },
   });
 
   const getDetailNotification = (notificationId: string) => {
-    console.log("application id sent", notificationId);
+    setViewedItems(viewedItems.add(notificationId));
     mutate({ notificationId });
   };
 
   return (
     <Sheet>
       <SheetTrigger className="group flex items-center -ml-2 p-2 relative">
-        <Bell className="h-6 w-6 flex-shrink-0 text-customColor group-hover:text-gray-400" />
+        <Bell className="h-6 w-6 flex-shrink-0 text-white group-hover:text-gray-400" />
         {notificationsFound?.unseen! > 0 && (
-          <span className="h-5 w-5 flex items-center justify-center bg-customColor p-3 absolute -top-1 -right-[25%] text-xs font-medium text-white rounded-full">
+          <span className="h-5 w-5 flex items-center justify-center bg-white p-3 absolute -top-1 -right-[25%] text-xs font-medium text-customColor rounded-full">
             {notificationsFound?.unseen!}
           </span>
         )}
@@ -53,10 +53,9 @@ const Notification = () => {
       <SheetContent className="flex w-[600px] flex-col pr-0 sm:max-w-xl">
         <SheetHeader>
           <SheetTitle className="text-customColor font-normal text-xl">
-            {" "}
             {notificationsFound?.unseen! > 0
               ? `You have ${notificationsFound?.unseen} new notifications`
-              : "You have't new notifications"}
+              : "You haven't new notifications"}
           </SheetTitle>
         </SheetHeader>
         {notificationsFound?.notification.length! > 0 ? (
@@ -92,7 +91,7 @@ const Notification = () => {
                                 Rejection of application
                               </h1>
                             ) : (
-                              <h1>Acceptance of appliction</h1>
+                              <h1>Acceptance of application</h1>
                             )}
                           </div>
 
@@ -102,11 +101,12 @@ const Notification = () => {
                           <div className="absolute right-0 bottom-0">
                             <TimeAgo datetime={item.createdAt} />
                           </div>
-                          {item.isViewed === "unseen" && (
-                            <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-sm rounded-sm">
-                              New
-                            </div>
-                          )}
+                          {!viewedItems.has(item.id) &&
+                            item.isViewed === "unseen" && (
+                              <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-sm rounded-sm">
+                                New
+                              </div>
+                            )}
                         </div>
                       </div>
                     </AccordionTrigger>
@@ -117,6 +117,10 @@ const Notification = () => {
                           <Button
                             className="text-white decoration-white w-1/4"
                             variant={"default"}
+                            onClick={() => {
+                              router.push(`/reapply/${application.id}`);
+                              router.refresh();
+                            }}
                           >
                             Reapply
                           </Button>

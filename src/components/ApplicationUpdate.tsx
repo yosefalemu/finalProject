@@ -1,3 +1,4 @@
+import { Application } from "@/payload-types";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,7 +7,10 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useEdgeStore } from "../lib/edgestore";
 import { useForm } from "react-hook-form";
-import { type FileState } from "@/components/MultiFileDropzone";
+import {
+  MultiImageDropzone,
+  type FileState,
+} from "@/components/MultiImageDropzone";
 import {
   ApplicationValidators,
   TApplicationValidator,
@@ -17,57 +21,90 @@ import { toast } from "sonner";
 import { Button as UploadButton } from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/user";
-import { MultiFileDropzone } from "./MultiFileDropzone";
 
-const ApplicationMain = () => {
+type ApplicationFoundProps = {
+  applicationFound: Application;
+};
+const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
+  console.log("REAAPLY", applicationFound);
   const router = useRouter();
   const { edgestore } = useEdgeStore();
   const { userId } = useUser();
 
   //STATE MANAGENMNET FOR THE AGENT LOGO
   const [agentLogoFile, setAgentLogoFile] = useState<FileState[]>([]);
+  const [agentLogoUrl, setAgentLogoUrl] = useState<{ url: string }[]>([]);
 
   //STATE MANAGENMENT FOR THE PROFILE PICTURE
   const [profileFile, setProfileFile] = useState<FileState[]>([]);
+  const [profileUrl, setProfileUrl] = useState<{ url: string }[]>([]);
 
   //STATE MANAGNMENT FOR THE NATIONAL ID
   const [natioanalIdFiles, setNationalIdFiles] = useState<FileState[]>([]);
+  const [nationalIdUrls, setNationalIdUrls] = useState<{ url: string }[]>([]);
 
   //STATE MANAGNMENT FOR THE MEDICAL FILES
   const [medicalFiles, setMedicalFiles] = useState<FileState[]>([]);
+  const [medicalUrls, setMedicalUrls] = useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE FOOTPRINT
   const [footPrintFile, setFootPrintFile] = useState<FileState[]>([]);
+  const [footPrintUrl, setFootPrintUrl] = useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE JOB EXPERIENCES DETAILS
   const [jobExperienceFile, setJobExperienceFile] = useState<FileState[]>([]);
+  const [jobExperienceUrls, setJobExperienceUrls] = useState<{ url: string }[]>(
+    []
+  );
   //STATE MANAGNMENT FOR THE EDUCATION CERTEFICATES
   const [educationalFile, setEducationalFile] = useState<FileState[]>([]);
+  const [educationalUrls, setEducationalUrls] = useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE TRADE PERMISSION
   const [tradePermissionFile, setTradePermissionFile] = useState<FileState[]>(
     []
   );
+  const [tradePermissionUrl, setTradePermissionUrl] = useState<
+    { url: string }[]
+  >([]);
   //STATE MANAGNMENT FOR EMPLOYEE QUALIFICATION ASSURANCE
   const [empQualificationAssuranceFile, setEmpQualificationAssuranceFile] =
     useState<FileState[]>([]);
+  const [empQualificationAssuranceUrls, setEmpQualificationAssuranceUrls] =
+    useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE STRUCTURE OF AGENCY
   const [structureOfAgencyFile, setStructureOfAgencyFile] = useState<
     FileState[]
   >([]);
+  const [structureOfAgencyUrls, setStructureOfAgencyUrls] = useState<
+    { url: string }[]
+  >([]);
   //STATE MANAGNMENT FOR THE RULES AND REGULATIONS
   const [rulesFile, setRulesFile] = useState<FileState[]>([]);
+  const [rulesUrls, setRulesUrls] = useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE FORM REGISTRATION
   const [formRegistrationFile, setFormRegistrationFile] = useState<FileState[]>(
     []
   );
+  const [formRegistrationUrls, setFormRegistrationUrls] = useState<
+    { url: string }[]
+  >([]);
   //STATE MANAGNMENT FOR THE WARRANTY
   const [warrantyFile, setWarrantyFile] = useState<FileState[]>([]);
+  const [warrantyUrls, setWarrantyUrls] = useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE BANK STATMENT
   const [bankStatementFile, setBankStatementFile] = useState<FileState[]>([]);
+  const [bankStatementUrls, setBankStatementUrls] = useState<{ url: string }[]>(
+    []
+  );
   //STATE MANAGNMENT FOR THE HOUSE RENT PAYMNET
   const [houseRentFile, setHouseRentFile] = useState<FileState[]>([]);
+  const [houseRentUrls, setHouseRentUrls] = useState<{ url: string }[]>([]);
   //STATE MANAGNMENT FOR THE UNIFORM DETAILS
   const [uniformDetailsFile, setUniformDetailsFile] = useState<FileState[]>([]);
+  const [uniformDetailsUrls, setUniformDetailsUrls] = useState<
+    { url: string }[]
+  >([]);
   //STATE MANAGNMENT FOR THE EMPLOYEE ID
   const [employeeIdFile, setEmployeeIdFile] = useState<FileState[]>([]);
+  const [employeeIdUrls, setEmployeeIdUrls] = useState<{ url: string }[]>([]);
 
   function updateFileProgressForAgentLogo(
     key: string,
@@ -180,9 +217,7 @@ const ApplicationMain = () => {
     { name: "Male", value: "male" },
     { name: "Female", value: "female" },
   ];
-  const handleInputChange = (fieldName: string) => {
-    clearErrors(fieldName as keyof TApplicationValidator);
-  };
+
   const {
     register,
     handleSubmit,
@@ -194,12 +229,9 @@ const ApplicationMain = () => {
     resolver: zodResolver(ApplicationValidators),
   });
 
-  useEffect(() => {
-    if (userId) {
-      setValue("applier", userId);
-    }
-  }, [userId, setValue]);
-
+  const handleInputChange = (fieldName: string) => {
+    clearErrors(fieldName as keyof TApplicationValidator);
+  };
   const { isLoading, mutate, isSuccess } =
     trpc.application.createApplication.useMutation({
       onError: (err: any) => {
@@ -216,13 +248,41 @@ const ApplicationMain = () => {
         return () => clearTimeout(timeOut);
       },
     });
+  useEffect(() => {
+    setValue("applier", userId);
+    if (agentLogoUrl.length > 0) {
+      setValue("agentLogoUrl", agentLogoUrl);
+    }
+    if (profileUrl.length > 0) {
+      setValue("profileUrl", profileUrl);
+    }
+    if (nationalIdUrls.length > 0) {
+      setValue("nationalIdUrls", nationalIdUrls);
+    }
+    if (medicalUrls.length > 0) {
+      setValue("medicalUrls", medicalUrls);
+    }
+    if (educationalUrls.length > 0) {
+      setValue("educationalUrls", educationalUrls);
+    }
+    if (uniformDetailsUrls.length > 0) {
+      setValue("uniformDetailsUrls", uniformDetailsUrls);
+    }
+    if (employeeIdUrls.length > 0) {
+      setValue("employeeIdUrls", employeeIdUrls);
+    }
+  }, [
+    agentLogoUrl,
+    profileUrl,
+    nationalIdUrls,
+    medicalUrls,
+    educationalUrls,
+    uniformDetailsUrls,
+    employeeIdUrls,
+    setValue,
+  ]);
   const onSubmit = (data: TApplicationValidator) => {
     const {
-      age,
-      agentName,
-      applier,
-      houseNumber,
-      sex,
       agentLogoUrl,
       profileUrl,
       nationalIdUrls,
@@ -231,13 +291,51 @@ const ApplicationMain = () => {
       uniformDetailsUrls,
       employeeIdUrls,
     } = data;
-    console.log("APPLICATION SUBMIT DATA", data);
+    if (agentLogoUrl.length === 0) {
+      toast.error("Agent logo is required");
+      return;
+    }
+    if (!profileUrl) {
+      toast.error("Profile is required");
+      return;
+    }
+    if (!natioanalIdFiles) {
+      toast.error("National id is required");
+      return;
+    } else if (nationalIdUrls.length < 2) {
+      toast.error("Please upload both the front and back of National Id");
+      return;
+    }
+    if (!medicalUrls) {
+      toast.error("Medical files required");
+      return;
+    }
+    if (!educationalUrls) {
+      toast.error("Educational file is required");
+      return;
+    }
+    if (!uniformDetailsUrls) {
+      toast.error("Uniform image is required");
+      return;
+    } else if (uniformDetailsUrls.length < 2) {
+      toast.error("Both the front and back of the uniform is required");
+      return;
+    }
+    if (!employeeIdUrls) {
+      toast.error("Employee Id is required");
+    } else if (employeeIdUrls.length < 2) {
+      toast.error("Both the front and back of the employee id is required");
+      return;
+    }
+    setValue("agentLogoUrl", agentLogoUrl);
+    setValue("profileUrl", profileUrl);
+    setValue("nationalIdUrls", nationalIdUrls);
+    setValue("medicalUrls", medicalUrls);
+    setValue("educationalUrls", educationalUrls);
+    setValue("uniformDetailsUrls", uniformDetailsUrls);
+    setValue("employeeIdUrls", employeeIdUrls);
     mutate({
-      age,
-      agentName,
-      applier,
-      houseNumber,
-      sex,
+      ...data,
       agentLogoUrl,
       profileUrl,
       nationalIdUrls,
@@ -249,19 +347,17 @@ const ApplicationMain = () => {
   };
   const allFields = watch(); // This will give you the current value of all fields
   console.log("ALL WATCHES", allFields);
+
   return (
-    <div className="p-6 h-full">
-      <div className="mx-auto h-full flex flex-col justify-between">
+    <div className="p-6 h-[845px] w-full overflow-y-scroll">
+      <div className="max-w-screen-2xl mx-auto">
         <div className="text-center">
           <h1 className="text-3xl">Apply page</h1>
         </div>
-        <div className="flex-1 flex justify-center w-full pt-6">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="w-full flex flex-col justify-between"
-          >
-            <div className="flex items-start justify-between">
-              <div className="w-fit">
+        <div className="">
+          <div className="flex justify-center">
+            <div className="w-5/6 sm:w-2/3 lg:1/2 xl:w-1/3">
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="py-2">
                   <Label
                     htmlFor="email"
@@ -272,6 +368,7 @@ const ApplicationMain = () => {
                   <div className="gap-1 py-2">
                     <Input
                       {...register("agentName")}
+                      value={applicationFound.agentName}
                       placeholder="Jossy Tibek"
                       className={cn({
                         "focus-visible:ring-red-600": errors.agentName,
@@ -295,6 +392,7 @@ const ApplicationMain = () => {
                   <div className="gap-1 py-2">
                     <Input
                       {...register("age")}
+                      value={applicationFound.age}
                       placeholder="23"
                       className={cn({
                         "focus-visible:ring-red-600": errors.age,
@@ -316,6 +414,7 @@ const ApplicationMain = () => {
 
                   <Input
                     {...register("sex")}
+                    value={applicationFound.sex}
                     placeholder="Select your gender"
                     list="gender"
                     onChange={(e) => {
@@ -347,6 +446,7 @@ const ApplicationMain = () => {
                   <div className="gap-1 py-2">
                     <Input
                       {...register("houseNumber")}
+                      value={applicationFound.houseNumber}
                       placeholder="1979"
                       className={cn({
                         "focus-visible:ring-red-600": errors.houseNumber,
@@ -361,30 +461,36 @@ const ApplicationMain = () => {
                     )}
                   </div>
                 </div>
-              </div>
-              <div className="w-fit">
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="agentLogoUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      Agent Logo
+                      <p>Agent Logo</p>
+                      {applicationFound.statusAgentLogoUrl === "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusAgentLogoUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Upload only one image
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={agentLogoFile}
                     dropzoneOptions={{
                       maxFiles: 1,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("agentLogoUrl");
-                      setAgentLogoFile;
-                    }}
+                    onChange={setAgentLogoFile}
                     onFilesAdded={async (addedFiles) => {
                       setAgentLogoFile([...agentLogoFile, ...addedFiles]);
                     }}
+                    disabled={
+                      applicationFound.statusAgentLogoUrl === "approved"
+                    }
                   />
                   <UploadButton
                     className="mt-2"
@@ -418,7 +524,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("agentLogoUrl", res.url);
+                            setAgentLogoUrl((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("agentLogoUrl", agentLogoUrl);
                           } catch (err) {
                             updateFileProgressForAgentLogo(
                               fileState.key,
@@ -436,36 +548,37 @@ const ApplicationMain = () => {
                   >
                     Upload
                   </UploadButton>
-                  {errors?.agentLogoUrl && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.agentLogoUrl.message}
-                    </p>
-                  )}
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="profileUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      Photo of Applicant
+                      <p>Photo of Applicant</p>
+                      {applicationFound.statusProfileUrl === "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusProfileUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Upload only one image
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={profileFile}
                     dropzoneOptions={{
                       maxFiles: 1,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("profileUrl");
-                      setProfileFile;
-                    }}
+                    onChange={setProfileFile}
                     onFilesAdded={async (addedFiles) => {
                       setProfileFile([...profileFile, ...addedFiles]);
                     }}
+                    disabled={applicationFound.statusProfileUrl === "approved"}
                   />
-                  <UploadButton
+                  <Button
                     className="mt-2"
                     onClick={async () => {
                       await Promise.all(
@@ -497,7 +610,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("profileUrl", res.url);
+                            setProfileUrl((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("profileUrl", profileUrl);
                           } catch (err) {
                             updateFileProgressForProfile(
                               fileState.key,
@@ -514,35 +633,38 @@ const ApplicationMain = () => {
                     }
                   >
                     Upload
-                  </UploadButton>
-                  {errors?.profileUrl && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.profileUrl.message}
-                    </p>
-                  )}
+                  </Button>
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="profileUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      National Id (Front and back)
+                      <p>National Id (Front and back)</p>
+                      {applicationFound.statusNationalIdUrl === "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusNationalIdUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Upload only two images
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={natioanalIdFiles}
                     dropzoneOptions={{
-                      maxFiles: 1,
+                      maxFiles: 2,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("nationalIdUrls");
-                      setNationalIdFiles;
-                    }}
+                    onChange={setNationalIdFiles}
                     onFilesAdded={async (addedFiles) => {
                       setNationalIdFiles([...natioanalIdFiles, ...addedFiles]);
                     }}
+                    disabled={
+                      applicationFound.statusNationalIdUrl === "approved"
+                    }
                   />
                   <UploadButton
                     className="mt-2"
@@ -576,7 +698,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("nationalIdUrls", res.url);
+                            setNationalIdUrls((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("nationalIdUrls", nationalIdUrls);
                           } catch (err) {
                             updateFileProgressForNationalId(
                               fileState.key,
@@ -594,38 +722,37 @@ const ApplicationMain = () => {
                   >
                     Upload
                   </UploadButton>
-                  {errors?.nationalIdUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.nationalIdUrls.message}
-                    </p>
-                  )}
                 </div>
-              </div>
-              <div className="w-fit">
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="profileUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      Medical Certificate{" "}
+                      <p>Medical Certificate</p>
+                      {applicationFound.statusMedicalUrl === "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusMedicalUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Can upload multiple images
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={medicalFiles}
                     dropzoneOptions={{
-                      maxFiles: 1,
+                      maxFiles: 6,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("medicalUrls");
-                      setMedicalFiles;
-                    }}
+                    onChange={setMedicalFiles}
                     onFilesAdded={async (addedFiles) => {
                       setMedicalFiles([...medicalFiles, ...addedFiles]);
                     }}
+                    disabled={applicationFound.statusMedicalUrl === "approved"}
                   />
-                  <UploadButton
+                  <Button
                     className="mt-2"
                     onClick={async () => {
                       await Promise.all(
@@ -657,7 +784,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("medicalUrls", res.url);
+                            setMedicalUrls((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("medicalUrls", medicalUrls);
                           } catch (err) {
                             updateFileProgressForMedical(
                               fileState.key,
@@ -674,37 +807,41 @@ const ApplicationMain = () => {
                     }
                   >
                     Upload
-                  </UploadButton>
-                  {errors?.medicalUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.medicalUrls.message}
-                    </p>
-                  )}
+                  </Button>
                 </div>
+
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="profileUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      Educational Certificates
+                      <p>Educational Certificates</p>
+                      {applicationFound.statusEducationalUrl === "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusEducationalUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Can upload multiple images
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={educationalFile}
                     dropzoneOptions={{
-                      maxFiles: 1,
+                      maxFiles: 6,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("educationalUrls");
-                      setEducationalFile;
-                    }}
+                    onChange={setEducationalFile}
                     onFilesAdded={async (addedFiles) => {
                       setEducationalFile([...educationalFile, ...addedFiles]);
                     }}
+                    disabled={
+                      applicationFound.statusEducationalUrl === "approved"
+                    }
                   />
-                  <UploadButton
+                  <Button
                     className="mt-2"
                     onClick={async () => {
                       await Promise.all(
@@ -736,7 +873,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("educationalUrls", res.url);
+                            setEducationalUrls((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("educationalUrls", educationalUrls);
                           } catch (err) {
                             updateFileProgressForEducational(
                               fileState.key,
@@ -753,38 +896,42 @@ const ApplicationMain = () => {
                     }
                   >
                     Upload
-                  </UploadButton>
-                  {errors?.educationalUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.educationalUrls.message}
-                    </p>
-                  )}
+                  </Button>
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="profileUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      Uniform Details (Front & Back)
+                      <p>Uniform Details (Front & Back)</p>
+                      {applicationFound.statusUniformDetailUrl ===
+                        "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusUniformDetailUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Upload only two images
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={uniformDetailsFile}
                     dropzoneOptions={{
-                      maxFiles: 1,
+                      maxFiles: 2,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("uniformDetailsUrls");
-                      setUniformDetailsFile;
-                    }}
+                    onChange={setUniformDetailsFile}
                     onFilesAdded={async (addedFiles) => {
                       setUniformDetailsFile([
                         ...uniformDetailsFile,
                         ...addedFiles,
                       ]);
                     }}
+                    disabled={
+                      applicationFound.statusUniformDetailUrl === "approved"
+                    }
                   />
                   <UploadButton
                     type="button"
@@ -819,7 +966,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("uniformDetailsUrls", res.url);
+                            setUniformDetailsUrls((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("uniformDetailsUrls", uniformDetailsUrls);
                           } catch (err) {
                             updateFileProgressForUniform(
                               fileState.key,
@@ -837,36 +990,37 @@ const ApplicationMain = () => {
                   >
                     Upload
                   </UploadButton>
-                  {errors?.uniformDetailsUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.uniformDetailsUrls.message}
-                    </p>
-                  )}
                 </div>
-              </div>
-              <div className="w-fit">
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
-                      className="text-xl text-customColor font-normal"
+                      htmlFor="profileUrl"
+                      className="text-xl text-customColor font-normal flex flex-col items-start gap-x-2"
                     >
-                      Employee Id(Front & Back)
+                      <p>Employee Id(Front & Back)</p>
+                      {applicationFound.statusEmployeeIdUrl === "rejected" && (
+                        <p className="text-red-500 font-semibold">
+                          {applicationFound?.statusEmployeeIdUrl?.toUpperCase()}
+                        </p>
+                      )}
                     </Label>
+                    <span className="text-gray-500 text-sm font-extralight text-right">
+                      *Upload only two images
+                    </span>
                   </div>
-                  <MultiFileDropzone
+                  <MultiImageDropzone
                     value={employeeIdFile}
                     dropzoneOptions={{
-                      maxFiles: 1,
+                      maxFiles: 2,
                       maxSize: 1024 * 1024 * 1, // 1 MB
                     }}
-                    onChange={() => {
-                      handleInputChange("employeeIdUrls");
-                      setEmployeeIdFile;
-                    }}
+                    onChange={setEmployeeIdFile}
                     onFilesAdded={async (addedFiles) => {
                       setEmployeeIdFile([...employeeIdFile, ...addedFiles]);
                     }}
+                    disabled={
+                      applicationFound.statusEmployeeIdUrl === "approved"
+                    }
                   />
                   <UploadButton
                     type="button"
@@ -901,7 +1055,13 @@ const ApplicationMain = () => {
                                 }
                               },
                             });
-                            setValue("employeeIdUrls", res.url);
+                            setEmployeeIdUrls((prev) => [
+                              ...prev,
+                              {
+                                url: res.url,
+                              },
+                            ]);
+                            setValue("employeeIdUrls", employeeIdUrls);
                           } catch (err) {
                             updateFileProgressForEmployee(
                               fileState.key,
@@ -919,51 +1079,43 @@ const ApplicationMain = () => {
                   >
                     Upload
                   </UploadButton>
-                  {errors?.employeeIdUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.employeeIdUrls.message}
-                    </p>
-                  )}
                 </div>
-              </div>
+
+                {isLoading ? (
+                  <Button
+                    type="submit"
+                    className={buttonVariants({
+                      size: "lg",
+                      className:
+                        "disabled:cursor-not-allowed w-full text-lg mt-6",
+                    })}
+                    disabled={isLoading}
+                  >
+                    Processing
+                    <Loader2
+                      size={22}
+                      className="animate-spin text-zinc-300 ml-2"
+                    />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className={buttonVariants({
+                      size: "lg",
+                      className:
+                        "disabled:cursor-not-allowed w-full text-lg mt-6 py-7 font-normal",
+                    })}
+                    disabled={isSuccess}
+                  >
+                    Apply
+                  </Button>
+                )}
+              </form>
             </div>
-            {isLoading ? (
-              <div className="flex justify-center">
-                <Button
-                  type="submit"
-                  className={buttonVariants({
-                    size: "lg",
-                    className:
-                      "disabled:cursor-not-allowed w-full text-lg mt-6",
-                  })}
-                  disabled={isLoading}
-                >
-                  Processing
-                  <Loader2
-                    size={22}
-                    className="animate-spin text-zinc-300 ml-2"
-                  />
-                </Button>
-              </div>
-            ) : (
-              <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  className={buttonVariants({
-                    size: "lg",
-                    className:
-                      "disabled:cursor-not-allowed w-1/4 text-center text-lg mt-6 py-7 font-normal",
-                  })}
-                  disabled={isSuccess}
-                >
-                  Apply
-                </Button>
-              </div>
-            )}
-          </form>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-export default ApplicationMain;
+export default ApplicationUpdate;

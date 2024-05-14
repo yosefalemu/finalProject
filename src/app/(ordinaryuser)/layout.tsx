@@ -7,12 +7,12 @@ const Layout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className="flex flex-col min-h-screen border-4 border-red-800">
+    <div className="flex flex-col min-h-screen max-w-screen overflow-hidden">
       <div className="">
         <MainNavBar />
       </div>
-      <div className="flex-grow flex">
-        <div className="w-fit border-r-2 border-gray-400">
+      <div className="flex-grow flex mt-[110px]">
+        <div className="w-fit border-r-2 border-customColorThree">
           <SideBar />
         </div>
         <div className="flex-grow">{children}</div>

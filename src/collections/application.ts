@@ -18,19 +18,14 @@ export const Application: CollectionConfig = {
     { name: "age", type: "text", required: true },
     {
       name: "sex",
-      type: "select",
+      type: "text",
       required: true,
-      options: [
-        { label: "Male", value: "male" },
-        { label: "Female", value: "female" },
-      ],
     },
     { name: "houseNumber", type: "text", required: true },
     {
       name: "agentLogoUrl",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusAgentLogoUrl",
@@ -43,10 +38,14 @@ export const Application: CollectionConfig = {
       ],
     },
     {
+      name: "agentLogoRejectionReason",
+      type: "textarea",
+      required: false,
+    },
+    {
       name: "profileUrl",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusProfileUrl",
@@ -59,10 +58,14 @@ export const Application: CollectionConfig = {
       ],
     },
     {
+      name: "profilePictureRejectionReason",
+      type: "textarea",
+      required: false,
+    },
+    {
       name: "nationalIdUrls",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusNationalIdUrl",
@@ -75,10 +78,14 @@ export const Application: CollectionConfig = {
       ],
     },
     {
+      name: "nationalIdRejectionReason",
+      type: "textarea",
+      required: false,
+    },
+    {
       name: "medicalUrls",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusMedicalUrl",
@@ -90,23 +97,25 @@ export const Application: CollectionConfig = {
         { label: "Rejected", value: "rejected" },
       ],
     },
+    {
+      name: "medicalFilesRejectionReason",
+      type: "textarea",
+      required: false,
+    },
     // {
     //   name: "footPrintUrl",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "jobExperienceUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     {
       name: "educationalUrls",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusEducationalUrl",
@@ -118,59 +127,55 @@ export const Application: CollectionConfig = {
         { label: "Rejected", value: "rejected" },
       ],
     },
+    {
+      name: "educationalFilesRejectionReason",
+      type: "textarea",
+      required: false,
+    },
     // {
     //   name: "tradePermissionUrl",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "empQualificationAssuranceUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "structureOfAgencyUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "rulesUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "formRegistrationUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "warrantyUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "bankStatementUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     // {
     //   name: "houseRentUrls",
-    //   type: "array",
+    //   type: "text",
     //   required: true,
-    //   fields: [{ name: "url", type: "text" }],
     // },
     {
       name: "uniformDetailsUrls",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusUniformDetailUrl",
@@ -183,10 +188,14 @@ export const Application: CollectionConfig = {
       ],
     },
     {
+      name: "uniformDetailRejectionReason",
+      type: "textarea",
+      required: false,
+    },
+    {
       name: "employeeIdUrls",
-      type: "array",
+      type: "text",
       required: true,
-      fields: [{ name: "url", type: "text" }],
     },
     {
       name: "statusEmployeeIdUrl",
@@ -197,6 +206,11 @@ export const Application: CollectionConfig = {
         { label: "Approved", value: "approved" },
         { label: "Rejected", value: "rejected" },
       ],
+    },
+    {
+      name: "employeeIdRejectionReason",
+      type: "textarea",
+      required: false,
     },
     {
       name: "responseOfScreener",

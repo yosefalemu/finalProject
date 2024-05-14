@@ -7,10 +7,9 @@ const SuccessApplication = () => {
         <div className="relative h-80 w-80">
           <Image fill src={"/mainImages/logo.png"} alt="LOGO" />
         </div>
-        <p className="text-customColor text-xl max-w-2xl text-center">
-          Congratulations, your application has been successfully submitted. We
-          will respond shortly. Please check the message section for our
-          response.
+        <p className="text-customColor text-xl max-w-xl text-center font-normal">
+          Your application has been submitted successfully. We will get back to
+          you soon. Please check the notifications section for our response.
         </p>
       </div>
     </div>

@@ -86,43 +86,29 @@ export interface Application {
   applier: string | OrdinaryUser;
   agentName: string;
   age: string;
-  sex: 'male' | 'female';
+  sex: string;
   houseNumber: string;
-  agentLogoUrl: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  agentLogoUrl: string;
   statusAgentLogoUrl?: ('pending' | 'approved' | 'rejected') | null;
-  profileUrl: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  agentLogoRejectionReason?: string | null;
+  profileUrl: string;
   statusProfileUrl?: ('pending' | 'approved' | 'rejected') | null;
-  nationalIdUrls: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  profilePictureRejectionReason?: string | null;
+  nationalIdUrls: string;
   statusNationalIdUrl?: ('pending' | 'approved' | 'rejected') | null;
-  medicalUrls: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  nationalIdRejectionReason?: string | null;
+  medicalUrls: string;
   statusMedicalUrl?: ('pending' | 'approved' | 'rejected') | null;
-  educationalUrls: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  medicalFilesRejectionReason?: string | null;
+  educationalUrls: string;
   statusEducationalUrl?: ('pending' | 'approved' | 'rejected') | null;
-  uniformDetailsUrls: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  educationalFilesRejectionReason?: string | null;
+  uniformDetailsUrls: string;
   statusUniformDetailUrl?: ('pending' | 'approved' | 'rejected') | null;
-  employeeIdUrls: {
-    url?: string | null;
-    id?: string | null;
-  }[];
+  uniformDetailRejectionReason?: string | null;
+  employeeIdUrls: string;
   statusEmployeeIdUrl?: ('pending' | 'approved' | 'rejected') | null;
+  employeeIdRejectionReason?: string | null;
   responseOfScreener?: ('pending' | 'approved' | 'rejected') | null;
   responseOfManager?: ('pending' | 'approved' | 'rejected') | null;
   selectedScreener: string | User;

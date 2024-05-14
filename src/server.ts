@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 // Configure EdgeStore
 const es = initEdgeStore.create();
 const edgeStoreRouter = es.router({
-  myPublicImages: es.imageBucket({ maxSize: 1024 * 1024 * 1 }),
+  myPublicFiles: es.fileBucket({ maxSize: 1024 * 1024 * 1 }),
 });
 const edgeStoreHandler = createEdgeStoreExpressHandler({
   router: edgeStoreRouter,

@@ -6,6 +6,8 @@ export const ordinaryNotificationRouter = router({
   getUserNotifications: privateProcedure.query(async ({ ctx }) => {
     const { user } = ctx;
     const reciever = user.id;
+    console.log("USERID", reciever);
+
     const payload = await getPayloadClient();
     const { docs: notificationFounds } = await payload.find({
       collection: "ordinaryNotification",

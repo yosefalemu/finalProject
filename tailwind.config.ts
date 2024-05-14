@@ -21,6 +21,8 @@ const config = {
       colors: {
         customColor: "#112846",
         customColorTwo: "#192E77",
+        customColorThree: "#EF9630",
+        customColorFour: "#FFA500",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
