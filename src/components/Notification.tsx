@@ -86,7 +86,7 @@ const Notification = () => {
                         </div>
                         <div className="flex-1 relative h-full">
                           <div className="flex items-center gap-x-2">
-                            {application.responseOfScreener === "rejected" ? (
+                            {application.responseOfScreener !== "approved" ? (
                               <h1 className="text-red-500 text-lg">
                                 Rejection of application
                               </h1>

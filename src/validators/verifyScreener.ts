@@ -21,6 +21,7 @@ export type TVerifyApplicationByScreener = z.infer<
 
 export const RejectApplicationByScreener = z.object({
   applicationId: z.string(),
+  rejectedDescriptions: z.string(),
 });
 
 export type TRejectApplicationByScreener = z.infer<

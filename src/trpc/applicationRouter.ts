@@ -4,6 +4,7 @@ import { getPayloadClient } from "../get-payload";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { User } from "@/payload-types";
+import { ReApplicationValidators } from "../validators/reapply-validators";
 
 export const applicationRouter = router({
   checkPersmission: publicProcedure
@@ -116,6 +117,129 @@ export const applicationRouter = router({
         },
       });
     }),
+  reapplyApplication: privateProcedure
+    .input(ReApplicationValidators)
+    .mutation(async ({ input }) => {
+      const {
+        age,
+        agentName,
+        sex,
+        houseNumber,
+        applicationId,
+        agentLogoUrl,
+        educationalUrls,
+        employeeIdUrls,
+        medicalUrls,
+        nationalIdUrls,
+        profileUrl,
+        uniformDetailsUrls,
+      } = input;
+      const payload = await getPayloadClient();
+
+      const applicationFound = await payload.findByID({
+        collection: "applications",
+        id: applicationId,
+      });
+
+      if (
+        applicationFound.statusAgentLogoUrl === "rejected" &&
+        applicationFound.agentLogoUrl === agentLogoUrl
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Agent logo is not changed!",
+        });
+      }
+      if (
+        applicationFound.statusProfileUrl === "rejected" &&
+        applicationFound.profileUrl === profileUrl
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Profile picture is not changed!",
+        });
+      }
+      if (
+        applicationFound.statusNationalIdUrl === "rejected" &&
+        applicationFound.nationalIdUrls === nationalIdUrls
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "National id is not changed!",
+        });
+      }
+      if (
+        applicationFound.statusMedicalUrl === "rejected" &&
+        applicationFound.medicalUrls === medicalUrls
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Medical files are not changed!",
+        });
+      }
+      if (
+        applicationFound.statusEducationalUrl === "rejected" &&
+        applicationFound.educationalUrls === educationalUrls
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Educational files are not changed!",
+        });
+      }
+      if (
+        applicationFound.statusUniformDetailUrl === "rejected" &&
+        applicationFound.uniformDetailsUrls === uniformDetailsUrls
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Uniform detail is not changed!",
+        });
+      }
+      if (
+        applicationFound.statusEmployeeIdUrl === "rejected" &&
+        applicationFound.employeeIdUrls === employeeIdUrls
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Employess id is not changed!",
+        });
+      }
+      await payload.update({
+        collection: "applications",
+        id: applicationId,
+        data: {
+          age,
+          agentName,
+          sex,
+          houseNumber,
+          agentLogoUrl,
+          profileUrl,
+          nationalIdUrls,
+          medicalUrls,
+          educationalUrls,
+          uniformDetailsUrls,
+          employeeIdUrls,
+          statusAgentLogoUrl: "pending",
+          statusProfileUrl: "pending",
+          statusNationalIdUrl: "pending",
+          statusMedicalUrl: "pending",
+          statusEducationalUrl: "pending",
+          statusUniformDetailUrl: "pending",
+          statusEmployeeIdUrl: "pending",
+          agentLogoRejectionReason: "",
+          profilePictureRejectionReason: "",
+          nationalIdRejectionReason: "",
+          medicalFilesRejectionReason: "",
+          educationalFilesRejectionReason: "",
+          uniformDetailRejectionReason: "",
+          employeeIdRejectionReason: "",
+          responseOfScreener: "pending",
+          responseOfManager: "pending",
+          rejectedDescriptions: "",
+        },
+      });
+    }),
+
   getSingleApplication: privateProcedure
     .input(z.object({ applicationId: z.string() }))
     .query(async ({ input, ctx }) => {

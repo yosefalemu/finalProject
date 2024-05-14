@@ -1,11 +1,10 @@
-import { getPayloadClient } from "../get-payload";
-import { privateProcedure, router } from "./trpc";
 import { z } from "zod";
+import { privateProcedure, router } from "./trpc";
+import { getPayloadClient } from "../get-payload";
 import { TRPCError } from "@trpc/server";
-import { OrdinaryUser } from "@/payload-types";
 
-export const screenerRouter = router({
-  getApplicationForScreener: privateProcedure
+export const managerRouter = router({
+  getApplicationForManager: privateProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100),
@@ -31,11 +30,11 @@ export const screenerRouter = router({
           and: [
             {
               responseOfScreener: {
-                equals: "pending",
+                equals: "approved",
               },
             },
             {
-              selectedScreener: {
+              selectedManager: {
                 equals: user.id,
               },
             },
@@ -69,7 +68,7 @@ export const screenerRouter = router({
       }
       return applicationFound;
     }),
-  verifyIndividualsByScreener: privateProcedure
+  verifyIndividualsByManager: privateProcedure
     .input(
       z.object({
         controller: z.string(),
@@ -236,7 +235,7 @@ export const screenerRouter = router({
         }
       }
     }),
-  approveByScreener: privateProcedure
+  approveByManager: privateProcedure
     .input(z.object({ applicationId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const { applicationId } = input;
@@ -281,34 +280,16 @@ export const screenerRouter = router({
           message: "Uniform detail is not approved yet!",
         });
       } else {
-        await payload.update({
-          collection: "applications",
-          id: applicationId,
-          data: {
-            responseOfScreener: "approved",
-            statusAgentLogoUrl: "pending",
-            statusProfileUrl: "pending",
-            statusNationalIdUrl: "pending",
-            statusEducationalUrl: "pending",
-            statusMedicalUrl: "pending",
-            statusEmployeeIdUrl: "pending",
-            statusUniformDetailUrl: "pending",
-            agentLogoRejectionReason: "",
-            profilePictureRejectionReason: "",
-            nationalIdRejectionReason: "",
-            educationalFilesRejectionReason: "",
-            medicalFilesRejectionReason: "",
-            employeeIdRejectionReason: "",
-            uniformDetailRejectionReason: "",
-          },
-        });
+        //   CREATE AGENT AND SEND THE CREDENTIAL THOUGH THE SYSTEM
       }
     }),
-  rejectByScreener: privateProcedure
-    .input(z.object({ applicationId: z.string() }))
+  rejectByManager: privateProcedure
+    .input(
+      z.object({ applicationId: z.string(), rejectedDescriptions: z.string() })
+    )
     .mutation(async ({ input, ctx }) => {
       const { user } = ctx;
-      const { applicationId } = input;
+      const { applicationId, rejectedDescriptions } = input;
       const payload = await getPayloadClient();
       const applicationFound = await payload.findByID({
         collection: "applications",
@@ -349,7 +330,7 @@ export const screenerRouter = router({
           code: "BAD_REQUEST",
           message: "Uniform detail is not validate yet!",
         });
-      } else if (applicationFound.responseOfScreener === "rejected") {
+      } else if (applicationFound.responseOfManager === "rejected") {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Application is already rejected!",
@@ -359,18 +340,9 @@ export const screenerRouter = router({
           collection: "applications",
           id: applicationId,
           data: {
-            responseOfScreener: "rejected",
-          },
-        });
-        const applier = applicationFound.applier as OrdinaryUser;
-        console.log("APPLIER", applier);
-        await payload.create({
-          collection: "ordinaryNotification",
-          data: {
-            application: applicationId,
-            reciever: applier.id,
-            sender: user.id,
-            message: "Rejection of your application",
+            responseOfManager: "rejected",
+            rejectedDescriptions: rejectedDescriptions,
+            responseOfScreener: "pending",
           },
         });
       }

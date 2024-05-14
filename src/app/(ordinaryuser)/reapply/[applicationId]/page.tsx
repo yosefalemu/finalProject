@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Reapply = ({ params }: { params: { applicationId: string } }) => {
   const { userId } = useUser();
-  const { data } = trpc.application.getSingleApplication.useQuery({
+  const { data, isLoading } = trpc.application.getSingleApplication.useQuery({
     applicationId: params.applicationId,
   });
 
@@ -26,21 +26,10 @@ const Reapply = ({ params }: { params: { applicationId: string } }) => {
               </Link>
             </div>
           </div>
-        ) : data?.applicationFound ? (
-          <ApplicationUpdate applicationFound={data?.applicationFound!} />
+        ) : isLoading ? (
+          <div>Loading</div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="h-4/5 flex flex-col items-center">
-              {" "}
-              <div className="relative h-80 w-80">
-                <Image fill src={"/mainImages/logo.png"} alt="LOGO" />
-              </div>
-              <p className="text-2xl text-customColor text-center w-2/3">
-                Your request has been received, and we're awaiting further
-                instructions. Please hold while we prepare our response.
-              </p>
-            </div>
-          </div>
+          <ApplicationUpdate applicationFound={data?.applicationFound!} />
         )}
       </div>
     </div>

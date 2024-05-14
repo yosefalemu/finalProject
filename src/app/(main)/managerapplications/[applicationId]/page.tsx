@@ -55,7 +55,7 @@ const ApplicationDetail = ({
     resolver: zodResolver(VerifyIndividualsApplicationByScreener),
   });
   const { mutate: verifyIndividuals, isLoading: isLoadingVerify } =
-    trpc.screener.verifyIndividualsByScreener.useMutation({
+    trpc.manager.verifyIndividualsByManager.useMutation({
       onSuccess: () => {
         toast.success(
           `${currentVerification}  ${
@@ -76,7 +76,7 @@ const ApplicationDetail = ({
   };
   //VERIFY APPLICATION
   const { isLoading: isLoadingApproveByScreener, mutate: approveByScreener } =
-    trpc.screener.approveByScreener.useMutation({
+    trpc.manager.approveByManager.useMutation({
       onSuccess: () => {
         toast.success("Application is verified successfully");
         setTimeout(() => {
@@ -109,7 +109,7 @@ const ApplicationDetail = ({
     setValue("applicationId", params.applicationId);
   }, []);
   const { mutate: rejectByScreener, isLoading: isLoaingForRejection } =
-    trpc.screener.rejectByScreener.useMutation({
+    trpc.manager.rejectByManager.useMutation({
       onSuccess: () => {
         toast.success("Application is rejected successfully");
         setTimeout(() => {
@@ -125,6 +125,7 @@ const ApplicationDetail = ({
   }: TRejectApplicationByScreener) => {
     rejectByScreener({
       applicationId,
+      rejectedDescriptions,
     });
   };
 

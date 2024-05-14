@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 // Set workerSrc to the version you've installed
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -15,9 +15,16 @@ interface PdfViewerProps {
 const PdfViewer: React.FC<PdfViewerProps> = ({ fileUrl }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setLoading(false);
+  };
+
+  const onDocumentLoadError = () => {
+    setLoading(false); // Ensure loading is turned off if there's an error loading the document
+    console.error("Failed to load the PDF document.");
   };
   const handlePreviousPage = () => {
     setPageNumber((prevPageNumber) => Math.max(1, prevPageNumber - 1));
@@ -28,9 +35,18 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ fileUrl }) => {
   };
 
   return (
-    <div className="flex flex-col h-[700px] w-fit mx-auto border border-gray-200">
-      <div className="flex-grow overflow-auto w-full">
-        <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess}>
+    <div className="flex flex-col h-[700px] mx-auto border border-gray-200">
+      <div className="flex-grow overflow-auto w-full h-full">
+        <Document
+          file={fileUrl}
+          onLoadSuccess={onDocumentLoadSuccess}
+          onLoadError={onDocumentLoadError}
+          loading={() => (
+            <div className="w-full aspect-video flex items-center justify-center">
+              <Loader2 className="text-customColor" size={100} />
+            </div>
+          )}
+        >
           <Page
             pageNumber={pageNumber}
             renderTextLayer={false}
@@ -38,7 +54,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ fileUrl }) => {
           />
         </Document>
       </div>
-      <div className="p-2 bg-gray-200 flex justify-between items-center">
+      <div className="p-2 bg-gray-200 flex flex-col justify-between items-center">
         <span>
           Page {pageNumber} of {numPages}
         </span>

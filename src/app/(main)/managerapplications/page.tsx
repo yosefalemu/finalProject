@@ -36,9 +36,9 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const ScreenerApplication = () => {
+const ManagerApplication = () => {
   const router = useRouter();
-  const { data } = trpc.screener.getApplicationForScreener.useInfiniteQuery({
+  const { data } = trpc.manager.getApplicationForManager.useInfiniteQuery({
     limit: 5,
   });
 
@@ -93,9 +93,6 @@ const ScreenerApplication = () => {
                 Status
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
-                Manager Status
-              </TableHead>
-              <TableHead className="text-lg text-center text-customColor">
                 Details
               </TableHead>
             </TableRow>
@@ -147,32 +144,6 @@ const ScreenerApplication = () => {
                     <CircleEllipsis className="text-orange-300" />
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-center text-green-500 cursor-pointer">
-                    {item.responseOfManager === "pending" ? (
-                      <CircleEllipsis className="text-orange-300" />
-                    ) : item.responseOfManager === "rejected" ? (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <ThumbsDown className=" text-red-600" />
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[785px]">
-                          <DialogHeader>
-                            <DialogDescription className="font-normal text-customColor text-lg mt-4">
-                              Application has been declined for the following
-                              reasons. If you have any questions or concerns,
-                              please don't hesitate to reach out to us for
-                              clarification.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="py-4">
-                            {item.rejectedDescriptions}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    ) : null}
-                  </div>
-                </TableCell>
                 <TableCell
                   className="text-right"
                   onClick={() => router.push(`applications/${item.id}`)}
@@ -215,4 +186,4 @@ const ScreenerApplication = () => {
     </div>
   );
 };
-export default ScreenerApplication;
+export default ManagerApplication;
