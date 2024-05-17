@@ -2,7 +2,7 @@ import { getPayloadClient } from "../get-payload";
 import { privateProcedure, router } from "./trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { OrdinaryUser } from "@/payload-types";
+import { OrdinaryUser, User } from "@/payload-types";
 
 export const screenerRouter = router({
   getApplicationForScreener: privateProcedure
@@ -93,6 +93,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -115,6 +121,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -137,6 +149,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -159,6 +177,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -181,6 +205,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -203,6 +233,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -225,6 +261,12 @@ export const screenerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -286,6 +328,7 @@ export const screenerRouter = router({
           id: applicationId,
           data: {
             responseOfScreener: "approved",
+            responseOfManager: "pending",
             statusAgentLogoUrl: "pending",
             statusProfileUrl: "pending",
             statusNationalIdUrl: "pending",
@@ -368,7 +411,7 @@ export const screenerRouter = router({
           collection: "ordinaryNotification",
           data: {
             application: applicationId,
-            reciever: applier.id,
+            reciever: applier.id as string,
             sender: user.id,
             message: "Rejection of your application",
           },

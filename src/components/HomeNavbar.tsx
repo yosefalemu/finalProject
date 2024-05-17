@@ -1,5 +1,4 @@
 import React from "react";
-import MaxWidthWrapper from "./MaxWidthWrapper";
 import Image from "next/image";
 import { Button, buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
@@ -11,21 +10,18 @@ type Props = {
 
 export default function HomeNavbar({ pathname }: Props) {
   return (
-    <div className="bg-white border-b border-gray-400 sticky h-28 z-50 top-0 inset-x-0">
-      <MaxWidthWrapper className="flex items-center justify-between">
-        <div className="relative h-28 w-28 rounded-full">
-          <Image
-            fill
-            src="/mainImages/logo.png"
-            alt="LOGO"
-            className="object-fill"
-          />
-        </div>
-        <div className="hidden lg:block">
-          <h1 className="text-3xl font-semibold text-customColor">
-            Private security agent managnment system
-          </h1>
-        </div>
+    <div className="fixed bg-white h-36 flex items-center top-0 z-50 inset-x-0 border-b-8 border-customColor">
+      <div className="flex items-center justify-between w-full pl-4 pr-16">
+        <Link href={"/"}>
+          <div className="relative w-[1400px] h-28">
+            <Image
+              fill
+              src={"/mainImages/logo2.png"}
+              alt="LOGOIMAGES"
+              className="object-cover"
+            />
+          </div>
+        </Link>
         <div className="flex items-center gap-x-4">
           {pathname === "/registor-as-agent" ? null : (
             <Link href={"registor-as-agent"}>
@@ -60,7 +56,7 @@ export default function HomeNavbar({ pathname }: Props) {
             </Link>
           )}
         </div>
-      </MaxWidthWrapper>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { privateProcedure, router } from "./trpc";
 import { getPayloadClient } from "../get-payload";
 import { TRPCError } from "@trpc/server";
+import { OrdinaryUser, User } from "@/payload-types";
 
 export const managerRouter = router({
   getApplicationForManager: privateProcedure
@@ -37,6 +38,9 @@ export const managerRouter = router({
               selectedManager: {
                 equals: user.id,
               },
+            },
+            {
+              responseOfManager: { equals: "pending" },
             },
           ],
         },
@@ -83,6 +87,12 @@ export const managerRouter = router({
       //UPDATE FOR THE AGENT URL
       if (controller === "agentLogoUrl") {
         if (approved) {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -114,6 +124,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -136,6 +152,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -158,6 +180,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -180,6 +208,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -202,6 +236,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -224,6 +264,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -284,12 +330,10 @@ export const managerRouter = router({
       }
     }),
   rejectByManager: privateProcedure
-    .input(
-      z.object({ applicationId: z.string(), rejectedDescriptions: z.string() })
-    )
+    .input(z.object({ applicationId: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const { applicationId } = input;
       const { user } = ctx;
-      const { applicationId, rejectedDescriptions } = input;
       const payload = await getPayloadClient();
       const applicationFound = await payload.findByID({
         collection: "applications",
@@ -336,15 +380,26 @@ export const managerRouter = router({
           message: "Application is already rejected!",
         });
       } else {
-        await payload.update({
-          collection: "applications",
-          id: applicationId,
-          data: {
-            responseOfManager: "rejected",
-            rejectedDescriptions: rejectedDescriptions,
-            responseOfScreener: "pending",
-          },
-        });
+        console.log("DONE");
+        console.log("DONE");
       }
+      await payload.update({
+        collection: "applications",
+        id: applicationId,
+        data: {
+          responseOfManager: "rejected",
+          responseOfScreener: "pending",
+        },
+      });
+      const reciever = applicationFound.selectedScreener as User;
+      await payload.create({
+        collection: "ordinaryNotification",
+        data: {
+          application: applicationId,
+          reciever: reciever.id as string,
+          sender: user.id,
+          message: `Application with agent name ${applicationFound.agentName} is rejected`,
+        },
+      });
     }),
 });

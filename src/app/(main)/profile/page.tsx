@@ -48,7 +48,7 @@ const Profile = () => {
   ];
   const isLoading = false;
   return (
-    <div className="h-full grid grid-cols-12 p-6 gap-x-6">
+    <div className="p-6 pt-14 h-full grid grid-cols-12 gap-x-6">
       <div className="col-span-6 h-full py-8 px-10 flex flex-col items-center gap-y-14">
         <div className="relative h-44 w-44 rounded-full overflow-hidden">
           <Image

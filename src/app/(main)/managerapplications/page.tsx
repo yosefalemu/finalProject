@@ -90,6 +90,9 @@ const ManagerApplication = () => {
                 Phone
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
+                Approved by
+              </TableHead>
+              <TableHead className="text-lg text-center text-customColor">
                 Status
               </TableHead>
               <TableHead className="text-lg text-center text-customColor">
@@ -139,6 +142,13 @@ const ManagerApplication = () => {
                     ? item.applier.phoneNumber
                     : "Not available"}
                 </TableCell>
+                <TableCell className="text-center text-customColor">
+                  {typeof item.selectedScreener === "object"
+                    ? item.selectedScreener.firstName +
+                      " " +
+                      item.selectedScreener.middleName
+                    : "Not available"}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-center">
                     <CircleEllipsis className="text-orange-300" />
@@ -146,7 +156,7 @@ const ManagerApplication = () => {
                 </TableCell>
                 <TableCell
                   className="text-right"
-                  onClick={() => router.push(`applications/${item.id}`)}
+                  onClick={() => router.push(`/managerapplications/${item.id}`)}
                 >
                   <div className="flex items-center justify-center text-green-500 cursor-pointer">
                     <ReceiptText />

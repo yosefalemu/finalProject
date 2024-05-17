@@ -1,12 +1,13 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Paperclip, Search, SendHorizonal } from "lucide-react";
 import Image from "next/image";
 
 const Chat = () => {
   const isOwn = false;
   return (
-    <div className="p-6 pb-1 border h-full w-full flex flex-col items-center gap-y-14">
+    <div className="p-6 pt-14 border h-full w-full flex flex-col items-center">
       <div className="grid grid-cols-12 w-full gap-x-4 h-full">
         <div className="col-span-4 bg-white border border-gray-300 h-full rounded-sm py-8 px-6 flex flex-col gap-y-4 items-center">
           <h1 className="text-3xl text-customColor">Conversations</h1>
@@ -28,7 +29,7 @@ const Chat = () => {
               New chat
             </Button>
           </div>
-          <div className="w-full flex flex-col gap-y-4 h-[650px]  overflow-y-scroll">
+          <div className="w-full flex flex-col gap-y-4 h-[630px]  overflow-y-scroll">
             <div className="bg-gray-200 flex items-center gap-x-8 p-2 rounded-sm cursor-pointer">
               <div className="relative h-16 w-16 rounded-full overflow-hidden">
                 <Image
@@ -181,7 +182,7 @@ const Chat = () => {
               <h1 className="text-xl text-customColor">Solomon Asregdom</h1>
             </div>
           </div>
-          <div className="h-[640px] bg-gray-200 border border-gray-200 rounded-sm overflow-y-scroll flex flex-col p-3 gap-y-3">
+          <div className="h-[550px] bg-gray-200 border border-gray-200 rounded-sm overflow-y-scroll flex flex-col p-3 gap-y-3">
             <div
               className={isOwn ? "flex w-full justify-end" : "justify-start"}
             >
@@ -345,7 +346,7 @@ const Chat = () => {
           </div>
           <div className="mt-4 mx-1">
             <div className="flex items-center justify-center gap-2 w-full relative">
-              <div className="absolute right-5 top-1/2 transform -translate-y-1/2 flex items-center gap-x-5">
+              <div className="absolute right-5 top-1/3 transform -translate-y-1/2 flex items-center gap-x-5">
                 <Paperclip
                   size={22}
                   className="text-gray-500 cursor-pointer"
@@ -357,9 +358,10 @@ const Chat = () => {
                   strokeWidth={2}
                 />
               </div>
-              <Input
+              <Textarea
                 placeholder="Type your message here"
-                className="py-7 px-2 rounded-lg text-lg focus-visible:ring-customColor"
+                className="py-1 px-2 rounded-lg text-lg focus-visible:ring-customColor"
+                rows={4}
               />
             </div>
           </div>

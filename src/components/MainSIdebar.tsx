@@ -9,10 +9,8 @@ const MainSideBar = async () => {
   console.log("LOGGED IN USER IN SIDEBAR", user);
 
   return (
-    <div className="bg-customColor h-full">
-      <div className="h-full">
-        <MainSidebarComponentsItem role={user?.role} />
-      </div>
+    <div className="h-[calc(100%_-_9rem)] bg-white w-64 fixed left-0 top-36 border-r-8 border-customColorThree">
+      <MainSidebarComponentsItem role={user?.role} />
     </div>
   );
 };

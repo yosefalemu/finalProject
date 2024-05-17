@@ -246,6 +246,5 @@ export const Application: CollectionConfig = {
       relationTo: "users",
       hasMany: false,
     },
-    { name: "rejectedDescriptions", type: "textarea" },
   ],
 };

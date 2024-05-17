@@ -235,7 +235,6 @@ export const applicationRouter = router({
           employeeIdRejectionReason: "",
           responseOfScreener: "pending",
           responseOfManager: "pending",
-          rejectedDescriptions: "",
         },
       });
     }),

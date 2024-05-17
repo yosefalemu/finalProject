@@ -11,7 +11,10 @@ const MainSidebarComponentsItem = ({
   role,
 }: MainSidebarComponentsItemProps) => {
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
+  const pathname = usePathname().split("/")[1].toLowerCase();
+  console.log("PATH NAME", pathname);
+
   const handleLogout = () => {
     document.cookie =
       "payload-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
@@ -24,8 +27,8 @@ const MainSidebarComponentsItem = ({
       <div>
         {MainSidebarComponents.map((item, index) => (
           <div
-            className={`pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-blue-900 hover:text-white cursor-pointer text-customColorThree  ${
-              pathname === "/" + item.url.toLowerCase().replace(/\s/g, "")
+            className={`pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-gray-200 hover:text-customColor cursor-pointer text-customColor  ${
+              pathname === item.url.toLowerCase().replace(/\s/g, "")
                 ? "border-l-4 border-customColorThree"
                 : ""
             }  ${item.role?.includes(role || "") ? "" : "hidden"}`}
@@ -42,7 +45,7 @@ const MainSidebarComponentsItem = ({
         ))}
       </div>
       <div
-        className="pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-blue-900 cursor-pointer text-red-700 border-t-2 border-red-700"
+        className="pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-gray-200 cursor-pointer text-red-700 border-t-2 border-red-700"
         onClick={handleLogout}
       >
         <LogOut size={32} />

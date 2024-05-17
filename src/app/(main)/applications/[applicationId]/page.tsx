@@ -10,17 +10,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/trpc/client";
 import {
-  TVerifyApplicationByScreener,
-  TVerifyIndividualsApplicationByScreener,
-  TRejectApplicationByScreener,
-  RejectApplicationByScreener,
-  VerifyIndividualsApplicationByScreener,
-} from "@/validators/verifyScreener";
+  TVerifyApplication,
+  TVerifyIndividualsApplication,
+  TRejectApplication,
+  RejectApplication,
+  VerifyIndividualsApplication,
+} from "@/validators/verify-application";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -48,11 +47,11 @@ const ApplicationDetail = ({
 
   //VERIFY INDIVIDUAL ITEMS
   const {
-    register: registerVerify,
+    register: registerIndividualVerify,
     reset,
     watch,
-  } = useForm<TVerifyIndividualsApplicationByScreener>({
-    resolver: zodResolver(VerifyIndividualsApplicationByScreener),
+  } = useForm<TVerifyIndividualsApplication>({
+    resolver: zodResolver(VerifyIndividualsApplication),
   });
   const { mutate: verifyIndividuals, isLoading: isLoadingVerify } =
     trpc.screener.verifyIndividualsByScreener.useMutation({
@@ -64,14 +63,16 @@ const ApplicationDetail = ({
         );
         reset({ message: "" });
       },
-      onError: () => {},
+      onError: (err) => {
+        toast.error(err.message);
+      },
     });
   const verifyByScreener = ({
     controller,
     approved,
     applicationId,
     message,
-  }: TVerifyIndividualsApplicationByScreener) => {
+  }: TVerifyIndividualsApplication) => {
     verifyIndividuals({ controller, approved, applicationId, message });
   };
   //VERIFY APPLICATION
@@ -87,24 +88,17 @@ const ApplicationDetail = ({
         toast.error(err.message);
       },
     });
-  const verifyApplication = ({
-    applicationId,
-  }: TVerifyApplicationByScreener) => {
+  const verifyApplication = ({ applicationId }: TVerifyApplication) => {
     approveByScreener({ applicationId });
   };
   // REJECT APPLICATION
   const {
-    register,
-    handleSubmit,
     clearErrors,
     setValue,
     formState: { errors },
-  } = useForm<TRejectApplicationByScreener>({
-    resolver: zodResolver(RejectApplicationByScreener),
+  } = useForm<TRejectApplication>({
+    resolver: zodResolver(RejectApplication),
   });
-  const handleInputChange = (fieldName: string) => {
-    clearErrors(fieldName as keyof TRejectApplicationByScreener);
-  };
   useEffect(() => {
     setValue("applicationId", params.applicationId);
   }, []);
@@ -120,9 +114,7 @@ const ApplicationDetail = ({
         toast.error(err.message);
       },
     });
-  const rejectApplication = ({
-    applicationId,
-  }: TRejectApplicationByScreener) => {
+  const rejectApplication = ({ applicationId }: TRejectApplication) => {
     rejectByScreener({
       applicationId,
     });
@@ -319,7 +311,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -380,6 +372,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusAgentLogoUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.agentLogoRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">
@@ -418,7 +429,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -479,6 +490,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusProfileUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.profilePictureRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">National Id</h1>
@@ -515,7 +545,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -576,6 +606,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusNationalIdUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.nationalIdRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">
@@ -614,7 +663,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -675,6 +724,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusEducationalUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.educationalFilesRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">Medical files</h1>
@@ -711,7 +779,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -772,6 +840,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusMedicalUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.medicalFilesRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">Employee Id</h1>
@@ -808,7 +895,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -869,6 +956,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusEmployeeIdUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.employeeIdRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
             <div className="flex items-center gap-x-4">
               <h1 className="flex-1 text-customColor text-xl">
@@ -907,7 +1013,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -968,6 +1074,25 @@ const ApplicationDetail = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              {data?.responseOfManager === "rejected" &&
+                data.statusUniformDetailUrl === "rejected" && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-red-500 hover:bg-red-700 text-white hover:text-white"
+                      >
+                        Rejected
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-fit flex flex-col">
+                      <DialogHeader>
+                        <DialogTitle className="">Rejection reason</DialogTitle>
+                      </DialogHeader>
+                      <p>{data.uniformDetailRejectionReason}</p>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
           </div>
         </div>

@@ -15,7 +15,7 @@ const Layout = ({
         <div className="w-fit border-r-2 border-gray-400">
           <MainSideBar />
         </div>
-        <div className="flex-grow">{children}</div>
+        <div className="pl-64 flex-grow">{children}</div>
       </div>
     </div>
   );

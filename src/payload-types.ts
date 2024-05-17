@@ -113,7 +113,6 @@ export interface Application {
   responseOfManager?: ('pending' | 'approved' | 'rejected') | null;
   selectedScreener: string | User;
   selectedManager: string | User;
-  rejectedDescriptions?: string | null;
   updatedAt: string;
   createdAt: string;
 }

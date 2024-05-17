@@ -1,5 +1,4 @@
 "use client";
-import ImageSlider from "@/components/imageSlider";
 import { Button } from "@/components/ui/button";
 import {
   DialogTitle,
@@ -10,17 +9,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/trpc/client";
 import {
-  TVerifyApplicationByScreener,
-  TVerifyIndividualsApplicationByScreener,
-  TRejectApplicationByScreener,
-  RejectApplicationByScreener,
-  VerifyIndividualsApplicationByScreener,
-} from "@/validators/verifyScreener";
+  TVerifyApplication,
+  TVerifyIndividualsApplication,
+  TRejectApplication,
+  RejectApplication,
+  VerifyIndividualsApplication,
+} from "@/validators/verify-application";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -40,7 +38,7 @@ const ApplicationDetail = ({
   );
 
   const { data, isLoading, isError } =
-    trpc.screener.getSingleApplication.useQuery({
+    trpc.manager.getSingleApplication.useQuery({
       applicationId: params.applicationId,
     });
 
@@ -48,11 +46,11 @@ const ApplicationDetail = ({
 
   //VERIFY INDIVIDUAL ITEMS
   const {
-    register: registerVerify,
+    register: registerIndividualVerify,
     reset,
     watch,
-  } = useForm<TVerifyIndividualsApplicationByScreener>({
-    resolver: zodResolver(VerifyIndividualsApplicationByScreener),
+  } = useForm<TVerifyIndividualsApplication>({
+    resolver: zodResolver(VerifyIndividualsApplication),
   });
   const { mutate: verifyIndividuals, isLoading: isLoadingVerify } =
     trpc.manager.verifyIndividualsByManager.useMutation({
@@ -64,18 +62,20 @@ const ApplicationDetail = ({
         );
         reset({ message: "" });
       },
-      onError: () => {},
+      onError: (err) => {
+        toast.error(err.message);
+      },
     });
-  const verifyByScreener = ({
+  const verifyByManager = ({
     controller,
     approved,
     applicationId,
     message,
-  }: TVerifyIndividualsApplicationByScreener) => {
+  }: TVerifyIndividualsApplication) => {
     verifyIndividuals({ controller, approved, applicationId, message });
   };
   //VERIFY APPLICATION
-  const { isLoading: isLoadingApproveByScreener, mutate: approveByScreener } =
+  const { isLoading: isLoadingForIndividualVerify, mutate: approveByManager } =
     trpc.manager.approveByManager.useMutation({
       onSuccess: () => {
         toast.success("Application is verified successfully");
@@ -87,28 +87,21 @@ const ApplicationDetail = ({
         toast.error(err.message);
       },
     });
-  const verifyApplication = ({
-    applicationId,
-  }: TVerifyApplicationByScreener) => {
-    approveByScreener({ applicationId });
+  const verifyApplicationManager = ({ applicationId }: TVerifyApplication) => {
+    approveByManager({ applicationId });
   };
   // REJECT APPLICATION
   const {
-    register,
-    handleSubmit,
-    clearErrors,
     setValue,
     formState: { errors },
-  } = useForm<TRejectApplicationByScreener>({
-    resolver: zodResolver(RejectApplicationByScreener),
+  } = useForm<TRejectApplication>({
+    resolver: zodResolver(RejectApplication),
   });
-  const handleInputChange = (fieldName: string) => {
-    clearErrors(fieldName as keyof TRejectApplicationByScreener);
-  };
+
   useEffect(() => {
     setValue("applicationId", params.applicationId);
   }, []);
-  const { mutate: rejectByScreener, isLoading: isLoaingForRejection } =
+  const { mutate: rejectByManager, isLoading: isLoaingForRejection } =
     trpc.manager.rejectByManager.useMutation({
       onSuccess: () => {
         toast.success("Application is rejected successfully");
@@ -120,12 +113,9 @@ const ApplicationDetail = ({
         toast.error(err.message);
       },
     });
-  const rejectApplication = ({
-    applicationId,
-  }: TRejectApplicationByScreener) => {
-    rejectByScreener({
+  const rejectApplicationManager = ({ applicationId }: TRejectApplication) => {
+    rejectByManager({
       applicationId,
-      rejectedDescriptions,
     });
   };
 
@@ -320,7 +310,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -329,7 +319,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "agentLogoUrl",
                           applicationId: params.applicationId,
@@ -366,7 +356,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "agentLogoUrl",
                           applicationId: params.applicationId,
@@ -419,7 +409,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -428,7 +418,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "profileUrl",
                           applicationId: params.applicationId,
@@ -465,7 +455,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "profileUrl",
                           applicationId: params.applicationId,
@@ -516,7 +506,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -525,7 +515,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "nationalIdUrls",
                           applicationId: params.applicationId,
@@ -562,7 +552,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "nationalIdUrls",
                           applicationId: params.applicationId,
@@ -615,7 +605,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -624,7 +614,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "educationalUrls",
                           applicationId: params.applicationId,
@@ -661,7 +651,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "educationalUrls",
                           applicationId: params.applicationId,
@@ -712,7 +702,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -721,7 +711,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "medicalUrls",
                           applicationId: params.applicationId,
@@ -758,7 +748,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "medicalUrls",
                           applicationId: params.applicationId,
@@ -809,7 +799,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -818,7 +808,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "employeeIdUrls",
                           applicationId: params.applicationId,
@@ -855,7 +845,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "employeeIdUrls",
                           applicationId: params.applicationId,
@@ -908,7 +898,7 @@ const ApplicationDetail = ({
                     </DialogDescription>
                   </DialogHeader>
                   <Textarea
-                    {...registerVerify("message")}
+                    {...registerIndividualVerify("message")}
                     className="focus-visible:ring-customColor"
                     placeholder="Type reject reason or approval message"
                   />
@@ -917,7 +907,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10 bg-red-600 hover:bg-red-800"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: false,
                           controller: "uniformDetailsUrls",
                           applicationId: params.applicationId,
@@ -954,7 +944,7 @@ const ApplicationDetail = ({
                       type="button"
                       className="px-10"
                       onClick={() => {
-                        verifyByScreener({
+                        verifyByManager({
                           approved: true,
                           controller: "uniformDetailsUrls",
                           applicationId: params.applicationId,
@@ -997,7 +987,9 @@ const ApplicationDetail = ({
                   type="submit"
                   className="px-10"
                   onClick={() =>
-                    rejectApplication({ applicationId: params.applicationId })
+                    rejectApplicationManager({
+                      applicationId: params.applicationId,
+                    })
                   }
                   disabled={isLoaingForRejection}
                 >
@@ -1020,7 +1012,7 @@ const ApplicationDetail = ({
                 <Button
                   type="button"
                   className="px-10 bg-red-600 hover:bg-red-800"
-                  disabled={isLoadingApproveByScreener}
+                  disabled={isLoadingForIndividualVerify}
                 >
                   Cancel
                 </Button>
@@ -1028,11 +1020,11 @@ const ApplicationDetail = ({
                   type="button"
                   className="px-10"
                   onClick={() => {
-                    verifyApplication({
+                    verifyApplicationManager({
                       applicationId: params.applicationId,
                     });
                   }}
-                  disabled={isLoadingApproveByScreener}
+                  disabled={isLoadingForIndividualVerify}
                 >
                   Verify
                 </Button>

@@ -115,7 +115,7 @@ const RegistorAsAgent = () => {
   return (
     <div>
       <MaxWidthWrapper className="">
-        <div className="flex flex-col gap-y-2 items-center py-2">
+        <div className="pt-36 flex flex-col gap-y-2 items-center py-2">
           <div className="relative h-52 w-52">
             <Image fill src="/mainImages/logo.png" alt="LOGO IMAGES" />
           </div>

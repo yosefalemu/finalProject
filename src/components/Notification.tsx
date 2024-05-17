@@ -43,9 +43,9 @@ const Notification = () => {
   return (
     <Sheet>
       <SheetTrigger className="group flex items-center -ml-2 p-2 relative">
-        <Bell className="h-6 w-6 flex-shrink-0 text-white group-hover:text-gray-400" />
+        <Bell className="h-6 w-6 flex-shrink-0 text-customColor group-hover:text-customColorTwo" />
         {notificationsFound?.unseen! > 0 && (
-          <span className="h-5 w-5 flex items-center justify-center bg-white p-3 absolute -top-1 -right-[25%] text-xs font-medium text-customColor rounded-full">
+          <span className="h-5 w-5 flex items-center justify-center bg-customColor p-3 absolute -top-1 -right-[25%] text-xs font-medium text-white rounded-full">
             {notificationsFound?.unseen!}
           </span>
         )}

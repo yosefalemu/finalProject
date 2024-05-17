@@ -18,12 +18,12 @@ const SideBar = () => {
   };
 
   return (
-    <div className="bg-customColor h-full flex flex-col justify-between">
+    <div className="h-[calc(100%_-_9rem)] bg-white w-72 fixed left-0 top-36 flex flex-col justify-between border-r-8 border-customColorThree">
       <div className="flex flex-col gap-y-4">
         {SidebarComponents.map((item, index) => (
           <div
             key={index}
-            className={`pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-blue-900 hover:text-white cursor-pointer text-customColorThree ${
+            className={`pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-gray-200 hover:text-customColor cursor-pointer text-customColor ${
               pathname === "/" + item.url.toLowerCase().replace(/\s/g, "")
                 ? "border-l-4 border-customColorThree"
                 : ""
@@ -40,7 +40,7 @@ const SideBar = () => {
         ))}
       </div>
       <div
-        className="pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-blue-900 cursor-pointer text-red-700 border-t-2 border-red-700"
+        className="pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-gray-200 cursor-pointer text-red-700 border-t-2 border-red-700"
         onClick={handleLogout}
       >
         <LogOut size={32} />

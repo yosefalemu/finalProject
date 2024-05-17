@@ -46,7 +46,7 @@ const ScreenerApplication = () => {
   const applications = data?.pages[0].items;
 
   return (
-    <div className="p-6 border h-full flex flex-col items-center gap-y-14">
+    <div className="p-6 pt-14 border h-full flex flex-col items-center gap-y-14">
       <div className="flex items-center justify-center gap-2 w-full sm:w-3/4 lg:w-5/12 relative">
         <div className="absolute left-5 top-1/2 transform -translate-y-1/2">
           <Search
@@ -152,24 +152,7 @@ const ScreenerApplication = () => {
                     {item.responseOfManager === "pending" ? (
                       <CircleEllipsis className="text-orange-300" />
                     ) : item.responseOfManager === "rejected" ? (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <ThumbsDown className=" text-red-600" />
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[785px]">
-                          <DialogHeader>
-                            <DialogDescription className="font-normal text-customColor text-lg mt-4">
-                              Application has been declined for the following
-                              reasons. If you have any questions or concerns,
-                              please don't hesitate to reach out to us for
-                              clarification.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="py-4">
-                            {item.rejectedDescriptions}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <ThumbsDown className=" text-red-600" />
                     ) : null}
                   </div>
                 </TableCell>

@@ -113,7 +113,7 @@ const SignIn = () => {
   console.log("ORDINARYUSER", isOrdinaryUser);
 
   return (
-    <div className="container relative flex items-center justify-center py-30 lg:px-0">
+    <div className="p-6 py-36 relative flex items-center justify-center lg:px-0">
       <div className="flex flex-col justify-center w-full sm:w-[350px] space-y-6 mx-auto">
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="relative h-52 w-52">
