@@ -4,40 +4,69 @@ import Notification from "./Notification";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useNavbarRefresh } from "@/hooks/navbarRefresh";
+import MaxWidthWrapper from "./MaxWidthWrapper";
+import { LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const MainNavBar = () => {
-  const { state } = useNavbarRefresh();
-  console.log("NAVBAR", state);
-
-  useEffect(() => {}, [state]);
-  console.log("NAVBAR");
+  const handleLogout = () => {
+    document.cookie =
+      "payload-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("logged-in-user");
+    localStorage.removeItem("refresh-state");
+    window.location.href = "/sign-in";
+  };
 
   return (
-    <div className="fixed bg-white h-36 flex items-center top-0 z-50 inset-x-0 border-b-8 border-customColor">
-      <div className="flex items-center justify-between w-full pl-4 pr-16">
+    <MaxWidthWrapper>
+      <div className="flex items-center justify-between w-full">
         <Link href={"/"}>
-          <div className="relative w-[1400px] h-28">
+          <div className="relative w-[800px] h-28">
             <Image
               fill
               src={"/mainImages/logo2.png"}
               alt="LOGOIMAGES"
-              className="object-cover"
+              className="object-contain"
             />
           </div>
         </Link>
         <div className="flex items-center gap-x-8">
           <Notification />
-          <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white">
-            <Image
-              fill
-              src={"/mainImages/profile.png"}
-              alt="LOGOIMAGES"
-              className="object-cover"
-            />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-customColorThree">
+                <Image
+                  fill
+                  src={"/mainImages/profile.png"}
+                  alt="LOGOIMAGES"
+                  className="object-cover"
+                />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <div
+                  className="py-1 flex items-center justify-start gap-x-2 text-red-500"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={18} />
+                  <h1 className="text-sm">Logout</h1>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-    </div>
+    </MaxWidthWrapper>
   );
 };
 export default MainNavBar;

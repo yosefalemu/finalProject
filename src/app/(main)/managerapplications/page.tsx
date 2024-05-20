@@ -46,7 +46,7 @@ const ManagerApplication = () => {
   const applications = data?.pages[0].items;
 
   return (
-    <div className="p-6 border h-full flex flex-col items-center gap-y-14">
+    <div className="p-6 border h-full flex flex-col items-center gap-y-6">
       <div className="flex items-center justify-center gap-2 w-full sm:w-3/4 lg:w-5/12 relative">
         <div className="absolute left-5 top-1/2 transform -translate-y-1/2">
           <Search
@@ -60,9 +60,8 @@ const ManagerApplication = () => {
           className="py-7 px-14 rounded-lg text-lg focus-visible:ring-customColor"
         />
       </div>
-      <div className="w-full border border-red-500 h-full flex flex-col justify-between">
+      <div className="w-full h-[calc(100vh-17rem)] flex flex-col justify-between">
         <Table className="w-full">
-          <TableCaption>All employees availables are here</TableCaption>
           <TableHeader>
             <TableRow className="bg-gray-100">
               <TableHead className="text-lg text-customColor">

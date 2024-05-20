@@ -2,7 +2,7 @@ import HomeSlider from "@/components/HomeSlider";
 
 const Home = () => {
   return (
-    <div className="h-full flex items-center justify-center">
+    <div className="p-6 h-full flex items-center justify-center">
       <HomeSlider />
     </div>
   );

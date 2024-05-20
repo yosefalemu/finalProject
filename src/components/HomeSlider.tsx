@@ -25,7 +25,7 @@ export function Example() {
 
 const HomeSlider = () => {
   return (
-    <MaxWidthWrapper className="flex-grow  flex items-center justify-center">
+    <MaxWidthWrapper className="mt-8 flex-grow flex items-center justify-center">
       <Carousel
         opts={{
           align: "center",

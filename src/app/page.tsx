@@ -3,9 +3,11 @@ import HomeSlider from "@/components/HomeSlider";
 
 export default function Home() {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col  h-screen">
       <HomeNavbar />
-      <HomeSlider />
+      <div className="pt-36">
+        <HomeSlider />
+      </div>
     </div>
   );
 }

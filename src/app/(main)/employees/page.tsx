@@ -139,7 +139,7 @@ const Employees = () => {
     },
   ];
   return (
-    <div className="p-6 border h-full flex flex-col items-center gap-y-14">
+    <div className="p-6 border h-full flex flex-col items-center gap-y-6">
       <div className="flex items-center justify-center gap-2 w-full sm:w-3/4 lg:w-5/12 relative">
         <div className="absolute left-5 top-1/2 transform -translate-y-1/2">
           <Search
@@ -153,7 +153,7 @@ const Employees = () => {
           className="py-7 px-14 rounded-lg text-lg focus-visible:ring-customColor"
         />
       </div>
-      <div className="w-full">
+      <div className="w-full h-[calc(100vh-17rem)]">
         <Table className="w-full">
           <TableCaption>All employees availables are here</TableCaption>
           <TableHeader>

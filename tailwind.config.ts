@@ -19,9 +19,9 @@ const config = {
     },
     extend: {
       colors: {
-        customColor: "#112846",
+        customColor: "#0c2a4c",
         customColorTwo: "#192E77",
-        customColorThree: "#EF9630",
+        customColorThree: "#dcc380",
         customColorFour: "#FFA500",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

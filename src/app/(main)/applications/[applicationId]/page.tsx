@@ -121,7 +121,7 @@ const ApplicationDetail = ({
   };
 
   return (
-    <div className="p-6 flex flex-col items-center justify-center border h-full border-red-400">
+    <div className="p-6 flex flex-col items-center justify-center h-[calc(100vh-17rem)]">
       <div className="w-4/5 h-4/5">
         <h1 className="text-4xl text-center">Application Details</h1>
         <div className="mt-8 w-full flex items-start gap-x-10">
