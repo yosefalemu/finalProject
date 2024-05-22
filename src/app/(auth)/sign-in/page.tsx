@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,6 @@ import {
   TSignInCredentialValidator,
 } from "@/validators/sigin-validators";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import Image from "next/image";
 import { useUser } from "@/hooks/user";
 
@@ -28,6 +27,8 @@ const SignIn = () => {
     useState<boolean>(true);
   const [url, setUrl] = useState<string>("");
   const isOrdinaryUser = searchParams.get("as") === "ordinaryUser";
+  const [errorToDisplay, setErrorToDisplay] = useState<string | null>(null);
+  const errorTimeoutRef = useRef<number | null>(null);
   const origin = searchParams.get("origin");
 
   const continueAsOrdinaryUser = () => {
@@ -61,12 +62,11 @@ const SignIn = () => {
       if (err.data?.code === "CONFLICT") {
         setIsNationalIdVerified(false);
       }
-      toast.error(err.message);
+      setErrorToDisplay(err.message);
     },
 
     onSuccess: ({ loggedInUserId }) => {
       addUserId(loggedInUserId);
-      toast.success("Signed in successfully");
       router.refresh();
       // if (origin) {
       //   router.push(`/${origin}`);
@@ -82,20 +82,16 @@ const SignIn = () => {
     isSuccess: isSuccessFOrUser,
   } = trpc.auth.signInUser.useMutation({
     onError: (err) => {
-      toast.error(err.message);
+      setErrorToDisplay(err.message);
     },
 
     onSuccess: ({}) => {
-      toast.success("Signed in successfully");
       router.refresh();
       // if (origin) {
       //   router.push(`/${origin}`);
       //   return;
       // }
-      const timeOut = setTimeout(() => {
-        router.push("/home");
-      }, 2000);
-      return () => clearTimeout(timeOut);
+      router.push("/home");
     },
   });
 
@@ -109,8 +105,23 @@ const SignIn = () => {
       mutateForUser({ email, password });
     }
   };
-  console.log("URL", url);
-  console.log("ORDINARYUSER", isOrdinaryUser);
+  useEffect(() => {
+    if (errorToDisplay) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = window.setTimeout(() => {
+        setErrorToDisplay(null);
+        errorTimeoutRef.current = null;
+      }, 4000);
+    }
+
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [errorToDisplay]);
 
   return (
     <div className="p-6 py-36 relative flex items-center justify-center lg:px-0">
@@ -131,6 +142,11 @@ const SignIn = () => {
           </Link>
         </div>
         <div className="grid gap-6">
+          {errorToDisplay && (
+            <p className="text-sm bg-red-600 text-white px-2 py-3 rounded-tr-md rounded-tl-sm error-border">
+              {errorToDisplay}
+            </p>
+          )}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-2">
               <div className="grid gap-2 py-2">

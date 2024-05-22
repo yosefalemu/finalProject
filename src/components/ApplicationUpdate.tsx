@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEdgeStore } from "../lib/edgestore";
 import { useForm } from "react-hook-form";
 import { type FileState } from "@/components/MultiFileDropzone";
@@ -40,6 +40,8 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
   const router = useRouter();
   const { edgestore } = useEdgeStore();
   const { userId } = useUser();
+  const [errorToDisplay, setErrorToDisplay] = useState<string | null>(null);
+  const errorTimeoutRef = useRef<number | null>(null);
 
   //STATE MANAGENMNET FOR THE AGENT LOGO
   const [agentLogoFile, setAgentLogoFile] = useState<FileState[]>([]);
@@ -85,6 +87,24 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
   const [uniformDetailsFile, setUniformDetailsFile] = useState<FileState[]>([]);
   //STATE MANAGNMENT FOR THE EMPLOYEE ID
   const [employeeIdFile, setEmployeeIdFile] = useState<FileState[]>([]);
+
+  useEffect(() => {
+    if (errorToDisplay) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = window.setTimeout(() => {
+        setErrorToDisplay(null);
+        errorTimeoutRef.current = null;
+      }, 4000);
+    }
+
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [errorToDisplay]);
 
   function updateFileProgressForAgentLogo(
     key: string,
@@ -224,17 +244,13 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
   const { isLoading, mutate, isSuccess } =
     trpc.application.reapplyApplication.useMutation({
       onError: (err: any) => {
-        console.log("ERROR OCCURED");
-        toast.error(err.message);
+        setErrorToDisplay(err.message);
       },
       onSuccess: () => {
         console.log("SUCCESS");
         toast.success("Application is successfully");
-        const timeOut = setTimeout(() => {
-          router.push("/success-application");
-          router.refresh();
-        }, 2000);
-        return () => clearTimeout(timeOut);
+        router.push("/success-application");
+        router.refresh();
       },
     });
   const onSubmit = (data: TReApplicationValidator) => {
@@ -292,6 +308,11 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
             >
               <div className="flex items-start justify-between">
                 <div className="w-fit">
+                  {errorToDisplay && (
+                    <p className="text-sm bg-red-600 text-white px-2 py-3 rounded-tr-md rounded-tl-sm error-border">
+                      {errorToDisplay}
+                    </p>
+                  )}
                   <div className="py-2">
                     <Label
                       htmlFor="agentName"
@@ -1183,7 +1204,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                     className={buttonVariants({
                       size: "lg",
                       className:
-                        "disabled:cursor-not-allowed w-1/4 text-lg mt-6",
+                        "disabled:cursor-not-allowed w-1/4 text-center text-lg mt-6 py-7 font-normal",
                     })}
                     disabled={isLoading}
                   >

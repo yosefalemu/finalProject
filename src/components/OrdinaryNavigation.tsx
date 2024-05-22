@@ -34,7 +34,7 @@ const OrdinaryNavigation = () => {
           <div>
             <item.icon />
           </div>
-          <h1 className="text-2xl">{item.name}</h1>
+          <h1 className="text-xl">{item.name}</h1>
         </div>
       ))}
     </div>

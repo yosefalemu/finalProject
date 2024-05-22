@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEdgeStore } from "../lib/edgestore";
 import { useForm } from "react-hook-form";
 import { type FileState } from "@/components/MultiFileDropzone";
@@ -13,16 +13,18 @@ import {
 } from "@/validators/application-validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "@/trpc/client";
-import { toast } from "sonner";
 import { Button as UploadButton } from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/user";
 import { MultiFileDropzone } from "./MultiFileDropzone";
+import { toast } from "sonner";
 
 const ApplicationMain = () => {
   const router = useRouter();
   const { edgestore } = useEdgeStore();
   const { userId } = useUser();
+  const [errorToDisplay, setErrorToDisplay] = useState<string | null>(null);
+  const errorTimeoutRef = useRef<number | null>(null);
 
   //STATE MANAGENMNET FOR THE AGENT LOGO
   const [agentLogoFile, setAgentLogoFile] = useState<FileState[]>([]);
@@ -69,6 +71,23 @@ const ApplicationMain = () => {
   //STATE MANAGNMENT FOR THE EMPLOYEE ID
   const [employeeIdFile, setEmployeeIdFile] = useState<FileState[]>([]);
 
+  useEffect(() => {
+    if (errorToDisplay) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = window.setTimeout(() => {
+        setErrorToDisplay(null);
+        errorTimeoutRef.current = null;
+      }, 4000);
+    }
+
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [errorToDisplay]);
   function updateFileProgressForAgentLogo(
     key: string,
     progress: FileState["progress"]
@@ -203,17 +222,12 @@ const ApplicationMain = () => {
   const { isLoading, mutate, isSuccess } =
     trpc.application.createApplication.useMutation({
       onError: (err: any) => {
-        console.log("ERROR OCCURED");
-        toast.error(err.message);
+        setErrorToDisplay(err.message);
       },
       onSuccess: () => {
-        console.log("SUCCESS");
         toast.success("Application is successfully");
-        const timeOut = setTimeout(() => {
-          router.push("/success-application");
-          router.refresh();
-        }, 2000);
-        return () => clearTimeout(timeOut);
+        router.push("/success-application");
+        router.refresh();
       },
     });
   const onSubmit = (data: TApplicationValidator) => {
@@ -250,7 +264,7 @@ const ApplicationMain = () => {
   const allFields = watch(); // This will give you the current value of all fields
   console.log("ALL WATCHES", allFields);
   return (
-    <div className="p-6 h-full">
+    <div className="py-14 h-full">
       <div className="mx-auto h-full flex flex-col justify-between">
         <div className="text-center">
           <h1 className="text-3xl">Apply page</h1>
@@ -260,8 +274,13 @@ const ApplicationMain = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="w-full flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex items-start  justify-center gap-x-10">
               <div className="w-fit">
+                {errorToDisplay && (
+                  <p className="text-sm bg-red-600 text-white px-2 py-3 rounded-tr-md rounded-tl-sm error-border">
+                    {errorToDisplay}
+                  </p>
+                )}
                 <div className="py-2">
                   <Label
                     htmlFor="email"
@@ -928,13 +947,13 @@ const ApplicationMain = () => {
               </div>
             </div>
             {isLoading ? (
-              <div className="flex justify-center">
+              <div className="flex justify-end">
                 <Button
                   type="submit"
                   className={buttonVariants({
                     size: "lg",
                     className:
-                      "disabled:cursor-not-allowed w-full text-lg mt-6",
+                      "disabled:cursor-not-allowed w-1/4 text-center text-lg mt-6 py-7 font-normal",
                   })}
                   disabled={isLoading}
                 >

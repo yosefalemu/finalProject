@@ -43,7 +43,10 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ fileUrl }) => {
           onLoadError={onDocumentLoadError}
           loading={() => (
             <div className="w-full aspect-video flex items-center justify-center">
-              <Loader2 className="text-customColor" size={100} />
+              <Loader2
+                className="animate-spin text-customColor ml-2"
+                size={100}
+              />
             </div>
           )}
         >

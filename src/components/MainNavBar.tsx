@@ -2,8 +2,6 @@
 import Image from "next/image";
 import Notification from "./Notification";
 import Link from "next/link";
-import { useEffect } from "react";
-import { useNavbarRefresh } from "@/hooks/navbarRefresh";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { LogOut } from "lucide-react";
 import {

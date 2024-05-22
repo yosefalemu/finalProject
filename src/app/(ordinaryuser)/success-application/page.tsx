@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const SuccessApplication = () => {
   return (
-    <div className="h-full flex flex-col items-center justify-center border border-teal-500">
+    <div className="h-[calc(100vh-17rem)] flex flex-col items-center justify-center">
       <div className="h-2/3 flex flex-col items-center">
         <div className="relative h-80 w-80">
           <Image fill src={"/mainImages/logo.png"} alt="LOGO" />

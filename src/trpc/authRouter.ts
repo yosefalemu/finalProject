@@ -1,5 +1,5 @@
 import { RegistorAsAgentValidators } from "../validators/registor-as-agent";
-import { publicProcedure, router } from "./trpc";
+import { privateProcedure, publicProcedure, router } from "./trpc";
 import { getPayloadClient } from "../get-payload";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -56,15 +56,32 @@ export const authRouter = router({
         );
 
         if (emailTaken) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Email is taken",
-          });
+          if (
+            ordinaryUser[0].nationalIdVerified === "approved" &&
+            ordinaryUser[0]._verified
+          ) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Email is taken",
+            });
+          } else {
+            await payload.delete({
+              collection: "ordinaryUser",
+              id: ordinaryUser[0].id,
+            });
+          }
         } else if (nationalIdTaken) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "National id is taken",
-          });
+          if (ordinaryUser[0].nationalIdVerified) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "National id is taken",
+            });
+          } else {
+            await payload.delete({
+              collection: "ordinaryUser",
+              id: ordinaryUser[0].id,
+            });
+          }
         } else if (phoneNumberTaken) {
           throw new TRPCError({
             code: "CONFLICT",
@@ -96,13 +113,17 @@ export const authRouter = router({
     .query(async ({ input }) => {
       const { token } = input;
       const payload = await getPayloadClient();
+      const { docs } = await payload.find({
+        collection: "ordinaryUser",
+        where: { _verificationToken: { equals: token } },
+      });
       const isVerified = await payload.verifyEmail({
         collection: "ordinaryUser",
         token,
       });
       if (!isVerified) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-      return { success: true };
+      return { success: true, email: docs[0].email };
     }),
   signInOrdinaryUser: publicProcedure
     .input(SignInCredentialValidator)
@@ -122,6 +143,12 @@ export const authRouter = router({
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email",
+        });
+      }
+      if (!registerUser[0]._verified) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Email is not verified yet",
         });
       }
       if (!(registerUser[0].nationalIdVerified === "approved")) {
@@ -191,5 +218,46 @@ export const authRouter = router({
         });
       }
       return { success: true };
+    }),
+  verifyNationalId: publicProcedure
+    .input(z.object({ email: z.string(), nationalId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { email, nationalId } = input;
+
+      // Normalize the input national ID by removing spaces and dashes
+      const normalizedNationalId = nationalId.replace(/[\s-]/g, "");
+
+      // Fetch the user's national ID from the database
+      const payload = await getPayloadClient();
+      const user = await payload.find({
+        collection: "ordinaryUser",
+        where: {
+          email: { equals: email },
+        },
+      });
+
+      // If the user is found, compare the normalized national IDs
+      if (user && user.docs.length > 0) {
+        const storedNationalId = user.docs[0].nationalId.replace(/[\s-]/g, "");
+
+        if (storedNationalId === normalizedNationalId) {
+          await payload.update({
+            collection: "ordinaryUser",
+            id: user.docs[0].id,
+            data: {
+              nationalIdVerified: "approved",
+            },
+          });
+          return { message: "National ID verified successfully" };
+        } else {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "The national ID does not match the one registered during sign-up. Please sign up again.",
+          });
+        }
+      } else {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "User not found" });
+      }
     }),
 });

@@ -57,3 +57,58 @@
     @apply bg-background text-foreground;
   }
 }
+@keyframes reduceWidth {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.error-border {
+  position: relative;
+}
+
+.error-border::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background-color: #dcc380;
+  animation: reduceWidth 4s linear forwards;
+}
+.fileUpload {
+  border: 2px solid #0c2a4c;
+  border-radius: 5px;
+  text-align: center;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+.fileUploadLabel {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+}
+.fileUploadLabel h2 {
+  color: #0c2a4c;
+}
+
+.upload__icon {
+  font-size: 30px;
+  color: #0c2a4c;
+}
+
+label p {
+  font-size: 14px;
+  color: #0c2a4c;
+}
+
+input {
+  display: none;
+}

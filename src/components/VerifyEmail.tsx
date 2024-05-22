@@ -51,14 +51,13 @@ const VerifyEmail = ({
           className={buttonVariants({
             className: "mt-8 w-full py-6",
           })}
-          href="/nationalid-verify"
+          href={`/nationalid-verify?email=${data.email}`}
         >
           Verify national id
         </Link>
       </div>
     );
   }
-
   if (!emailVerified && isLoading) {
     return (
       <div className="flex flex-col items-center gap-2">

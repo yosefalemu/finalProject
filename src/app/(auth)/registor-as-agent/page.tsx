@@ -1,5 +1,4 @@
 "use client";
-import HomeNavbar from "@/components/HomeNavbar";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,16 +12,16 @@ import {
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useForm, FieldError } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const RegistorAsAgent = () => {
   const router = useRouter();
   const [visible, setVisible] = useState<boolean>(true);
+  const [errorToDisplay, setErrorToDisplay] = useState<string | null>(null);
+  const errorTimeoutRef = useRef<number | null>(null);
   const {
     register,
     handleSubmit,
@@ -40,11 +39,10 @@ const RegistorAsAgent = () => {
     trpc.auth.createOrdinaryUser.useMutation({
       onError: (err) => {
         if (err.data?.code === "CONFLICT") {
-          toast.error(err.message);
+          setErrorToDisplay(err.message);
         }
       },
       onSuccess: ({ sentToEmail, nationalId }) => {
-        toast.success("Verification link is send to your email");
         router.push(`/verify-email?to=${sentToEmail}&nationalId=${nationalId}`);
       },
     });
@@ -80,10 +78,7 @@ const RegistorAsAgent = () => {
       console.log("TRUE", password !== confirmPassword);
       clearErrors("password");
       clearErrors("confirmPassword");
-      console.log("ERROR OCCURED PASSWORD DOESNOT MATCH");
-
       // Set error messages for password and confirmPassword
-
       setError("password", {
         type: "manual",
         message: "Passwords do not match",
@@ -112,10 +107,28 @@ const RegistorAsAgent = () => {
     });
   };
 
+  useEffect(() => {
+    if (errorToDisplay) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = window.setTimeout(() => {
+        setErrorToDisplay(null);
+        errorTimeoutRef.current = null;
+      }, 4000);
+    }
+
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [errorToDisplay]);
+
   return (
     <div>
       <MaxWidthWrapper className="">
-        <div className="pt-36 flex flex-col gap-y-2 items-center py-2">
+        <div className="pt-36 flex flex-col gap-y-2 items-center py-2 pb-8">
           <div className="relative h-52 w-52">
             <Image fill src="/mainImages/logo.png" alt="LOGO IMAGES" />
           </div>
@@ -136,6 +149,13 @@ const RegistorAsAgent = () => {
           </div>
           <div className="w-full flex items-center justify-center">
             <form className="w-full sm:w-5/6" onSubmit={handleSubmit(onSubmit)}>
+              {errorToDisplay && (
+                <div className="w-full flex justify-start">
+                  <p className="text-sm bg-red-600 text-white px-2 py-3 rounded-tr-md rounded-tl-sm error-border w-1/2">
+                    {errorToDisplay}
+                  </p>
+                </div>
+              )}
               <div className="flex items-start gap-x-14">
                 <div className="flex-1">
                   <div className="py-2">
@@ -447,31 +467,35 @@ const RegistorAsAgent = () => {
               </div>
 
               {isLoading ? (
-                <Button
-                  className={buttonVariants({
-                    size: "lg",
-                    className:
-                      "disabled:cursor-not-allowed w-full text-lg mt-6",
-                  })}
-                  disabled={isLoading}
-                >
-                  Processing
-                  <Loader2
-                    size={22}
-                    className="animate-spin text-zinc-300 ml-2"
-                  />
-                </Button>
+                <div className="w-full flex justify-end">
+                  <Button
+                    className={buttonVariants({
+                      size: "lg",
+                      className:
+                        "disabled:cursor-not-allowed w-1/2 text-lg mt-6 py-7 font-normal",
+                    })}
+                    disabled={isLoading}
+                  >
+                    Processing
+                    <Loader2
+                      size={22}
+                      className="animate-spin text-zinc-300 ml-2"
+                    />
+                  </Button>
+                </div>
               ) : (
-                <Button
-                  className={buttonVariants({
-                    size: "lg",
-                    className:
-                      "disabled:cursor-not-allowed w-full text-lg mt-6 py-7 font-normal",
-                  })}
-                  disabled={isSuccess}
-                >
-                  Registor
-                </Button>
+                <div className="w-full flex justify-end">
+                  <Button
+                    className={buttonVariants({
+                      size: "lg",
+                      className:
+                        "disabled:cursor-not-allowed w-1/2 text-lg mt-6 py-7 font-normal",
+                    })}
+                    disabled={isSuccess || errorToDisplay ? true : false}
+                  >
+                    Registor
+                  </Button>
+                </div>
               )}
             </form>
           </div>

@@ -39,20 +39,10 @@ const MainNavigationComponentsItem = ({
           <div>
             <item.icon />
           </div>
-          <h1 className="text-2xl">{item.name}</h1>
+          <h1 className="text-xl">{item.name}</h1>
         </div>
       ))}
     </div>
   );
 };
 export default MainNavigationComponentsItem;
-
-{
-  /* <div
-        className="pl-2 pr-6 py-4 flex items-center gap-x-2 hover:bg-gray-200 cursor-pointer text-red-700 border-t-2 border-red-700"
-        onClick={handleLogout}
-      >
-        <LogOut size={32} />
-        <h1 className="text-2xl">Logout</h1>
-      </div> */
-}
