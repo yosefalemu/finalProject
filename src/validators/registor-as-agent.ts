@@ -1,4 +1,3 @@
-import exp from "constants";
 import { z } from "zod";
 
 export const RegistorAsAgentValidators = z.object({
@@ -27,6 +26,15 @@ export const RegistorAsAgentValidators = z.object({
     .string()
     .min(1, { message: "Email is required" })
     .email("Invalid email"),
+  dateOfBirth: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Date of birth must be in the format YYYY-MM-DD"
+    )
+    .refine((dateString) => new Date(dateString) <= new Date(), {
+      message: "Date of birth cannot be in the future",
+    }),
   nationalId: z.string().superRefine((val, ctx) => {
     const normalizedValue = val.replace(/\s/g, "");
 

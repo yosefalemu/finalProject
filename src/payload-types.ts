@@ -12,6 +12,8 @@ export interface Config {
     ordinaryUser: OrdinaryUser;
     applications: Application;
     ordinaryNotification: OrdinaryNotification;
+    agents: Agent;
+    employee: Employee;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -30,11 +32,13 @@ export interface User {
   phoneNumber: string;
   sex: 'male' | 'female';
   role: 'screener' | 'manager' | 'admin';
+  dateOfBirth: string;
   profile?: string | null;
   city: string;
   woreda: string;
   kebele: string;
   manager?: (string | null) | User;
+  permission: 'allowed' | 'rejected';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -59,6 +63,7 @@ export interface OrdinaryUser {
   lastName: string;
   nationalId: string;
   phoneNumber: string;
+  dateOfBirth: string;
   profile?: string | null;
   city: string;
   woreda: string;
@@ -132,6 +137,71 @@ export interface OrdinaryNotification {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "agents".
+ */
+export interface Agent {
+  id: string;
+  agentAdmin: string | OrdinaryUser;
+  randomPassword: string;
+  application: string | Application;
+  permission?: ('pending' | 'allowed' | 'rejected') | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employee".
+ */
+export interface Employee {
+  id: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  sex: string;
+  age: string;
+  educationLevel: string;
+  nationalId: string;
+  phoneNumber: string;
+  dateOfEmployement: string;
+  forensicRecordsUrls: string;
+  medicalExaminationUrls: string;
+  regionofemployment: string;
+  cityofemployment: string;
+  specificplaceofemployment: string;
+  employmentposition: string;
+  region: string;
+  zone: string;
+  woreda: string;
+  kebele: string;
+  houseNumber: string;
+  martialStatus: string;
+  getCoughtFirstName: string;
+  getCoughtMiddleName: string;
+  getCoughtLastName: string;
+  getCoughtRegion: string;
+  getCoughtZone: string;
+  getCoughtKebele: string;
+  getCoughtHouseNumber: string;
+  getCoughtNationalId: string;
+  getCoughtPhoneNumber: string;
+  status?: ('employeed' | 'free') | null;
+  activeAgent?: (string | null) | Agent;
+  prevAgents: (string | Agent)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
@@ -144,6 +214,10 @@ export interface PayloadPreference {
     | {
         relationTo: 'ordinaryUser';
         value: string | OrdinaryUser;
+      }
+    | {
+        relationTo: 'agents';
+        value: string | Agent;
       };
   key?: string | null;
   value?:

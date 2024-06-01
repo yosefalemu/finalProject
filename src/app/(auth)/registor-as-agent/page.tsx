@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
+import { string } from "zod";
 
 const RegistorAsAgent = () => {
   const router = useRouter();
@@ -55,25 +56,12 @@ const RegistorAsAgent = () => {
     password,
     confirmPassword,
     nationalId,
+    dateOfBirth,
     phoneNumber,
     city,
     woreda,
     kebele,
   }: TRegistorAsAgentValidators) => {
-    console.log(
-      firstName,
-      middleName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-      nationalId,
-      phoneNumber,
-      city,
-      woreda,
-      kebele
-    );
-
     if (password !== confirmPassword) {
       console.log("TRUE", password !== confirmPassword);
       clearErrors("password");
@@ -92,11 +80,14 @@ const RegistorAsAgent = () => {
       return;
     }
     console.log("errors", errors?.password?.message);
+    console.log("ERRORS", errors.dateOfBirth);
+
     mutate({
       firstName,
       middleName,
       lastName,
       email,
+      dateOfBirth,
       password,
       confirmPassword,
       nationalId,
@@ -197,7 +188,7 @@ const RegistorAsAgent = () => {
                         className={cn({
                           "focus-visible:ring-red-600": errors.middleName,
                         })}
-                        onChange={() => handleInputChange("middletName")}
+                        onChange={() => handleInputChange("middleName")}
                       />
                       {errors?.middleName && (
                         <p className="text-sm text-red-500 mt-2">
@@ -303,6 +294,30 @@ const RegistorAsAgent = () => {
                   </div>
                 </div>
                 <div className="flex-1">
+                  <div className="py-2">
+                    <Label
+                      htmlFor="dateOfBirth"
+                      className="text-xl text-customColor font-normal"
+                    >
+                      Date of birth
+                    </Label>
+                    <div className="gap-1 py-2">
+                      <Input
+                        {...register("dateOfBirth")}
+                        placeholder="21-06-2000"
+                        type="date"
+                        className={cn({
+                          "focus-visible:ring-red-600": errors.dateOfBirth,
+                        })}
+                        onChange={() => handleInputChange("dateOfBirth")}
+                      />
+                      {errors?.dateOfBirth && (
+                        <p className="text-sm text-red-500 mt-2">
+                          {errors.dateOfBirth.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                   <div className="py-2">
                     <Label
                       htmlFor="city"

@@ -52,7 +52,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
 import { RejectAgent, TRejectAgent } from "@/validators/agent-validators";
 
-const Agents = () => {
+const AgentEmployees = () => {
   const router = useRouter();
   const { data, isLoading } = trpc.agent.getAgents.useInfiniteQuery({
     limit: 10,
@@ -392,4 +392,4 @@ const Agents = () => {
     </>
   );
 };
-export default Agents;
+export default AgentEmployees;

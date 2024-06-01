@@ -153,7 +153,7 @@ const Employees = () => {
           className="py-7 px-14 rounded-lg text-lg focus-visible:ring-customColor"
         />
       </div>
-      <div className="w-full h-[calc(100vh-17rem)]">
+      <div className="w-full h-[calc(100vh-18rem)]">
         <Table className="w-full">
           <TableCaption>All employees availables are here</TableCaption>
           <TableHeader>

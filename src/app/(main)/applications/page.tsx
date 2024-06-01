@@ -106,7 +106,7 @@ const ScreenerApplication = () => {
               className="py-7 px-14 rounded-lg text-lg focus-visible:ring-gray-400"
             />
           </div>
-          <div className="w-full h-[calc(100vh-17rem)] flex flex-col justify-between">
+          <div className="w-full h-[calc(100vh-18rem)] flex flex-col justify-between">
             <Table className="w-full border border-violet-600">
               <TableHeader>
                 <TableRow className="bg-gray-100">

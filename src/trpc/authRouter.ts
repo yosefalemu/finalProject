@@ -17,6 +17,7 @@ export const authRouter = router({
         password,
         nationalId,
         phoneNumber,
+        dateOfBirth,
         city,
         woreda,
         kebele,
@@ -100,6 +101,7 @@ export const authRouter = router({
           password,
           nationalId,
           nationalIdVerified: "pending",
+          dateOfBirth,
           phoneNumber,
           city,
           woreda,
@@ -165,22 +167,22 @@ export const authRouter = router({
         });
       }
 
-      const logedInUser = await payload.login({
-        collection: "ordinaryUser",
-        data: {
-          email,
-          password,
-        },
-        res,
-      });
-      if (!logedInUser) {
+      try {
+        const logedInUser = await payload.login({
+          collection: "ordinaryUser",
+          data: {
+            email,
+            password,
+          },
+          res,
+        });
+        return { success: true, loggedInUserId: logedInUser.user.id };
+      } catch (error) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Incorrect password",
         });
       }
-
-      return { success: true, loggedInUserId: logedInUser.user.id };
     }),
   signInUser: publicProcedure
     .input(SignInCredentialValidator)
@@ -205,6 +207,55 @@ export const authRouter = router({
       try {
         await payload.login({
           collection: "users",
+          data: {
+            email,
+            password,
+          },
+          res,
+        });
+      } catch (error) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Incorrect password",
+        });
+      }
+      return { success: true };
+    }),
+  signInAgent: publicProcedure
+    .input(SignInCredentialValidator)
+    .mutation(async ({ input, ctx }) => {
+      const { email, password } = input;
+      const { res } = ctx;
+      const payload = await getPayloadClient();
+      const { docs: registerUser } = await payload.find({
+        collection: "agents",
+        where: {
+          email: {
+            equals: email,
+          },
+        },
+      });
+      if (registerUser?.length === 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid email",
+        });
+      }
+      if (!registerUser[0]._verified) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Agent not verified. Please visit the office to verify.",
+        });
+      }
+      if (!registerUser[0].permission) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Access denied. Check notification in your ordinary account",
+        });
+      }
+      try {
+        await payload.login({
+          collection: "agents",
           data: {
             email,
             password,

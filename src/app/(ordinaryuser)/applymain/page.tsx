@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const ApplyPage = () => {
   const { userId } = useUser();
-  const { data, isLoading, refetch } =
+  const { data, isLoading, isError } =
     trpc.application.checkPersmission.useQuery(
       {
         applier: userId,
@@ -19,6 +19,7 @@ const ApplyPage = () => {
         refetchOnWindowFocus: true,
       }
     );
+  console.log("LOG", isError);
 
   return (
     <div className="h-full px-14">
@@ -77,9 +78,7 @@ const ApplyPage = () => {
             </Link>
           </div>
         </div>
-      ) : data?.success === true ? (
-        <ApplicationMain />
-      ) : (
+      ) : isError ? (
         <div className="w-full h-[calc(100vh-17rem)] flex flex-col items-center justify-center">
           <div className="h-4/5 flex flex-col items-center">
             <div className="relative h-80 w-80">
@@ -91,6 +90,8 @@ const ApplyPage = () => {
             </p>
           </div>
         </div>
+      ) : (
+        <ApplicationMain />
       )}
     </div>
   );

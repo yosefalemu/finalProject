@@ -35,6 +35,7 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const ManagerApplication = () => {
@@ -46,6 +47,7 @@ const ManagerApplication = () => {
 
   console.log("APPLICATIONS", data?.pages[0]);
   const applications = data?.pages[0].items;
+
   return (
     <>
       {isLoading ? (
@@ -73,6 +75,24 @@ const ManagerApplication = () => {
             </div>
           </div>
         </div>
+      ) : applications?.length === 0 ? (
+        <div className="w-full h-[calc(100vh-9rem)] flex flex-col justify-between p-8">
+          <p className="w-full h-full flex items-center justify-center">
+            <div className="h-3/4">
+              <div className="relative h-80 w-80">
+                <Image
+                  fill
+                  src={"/mainImages/emptyNotification.png"}
+                  alt="Empty"
+                  className="object-contain"
+                />
+              </div>
+              <h1 className="text-customColor text-xl">
+                You haven't received any applications yet.
+              </h1>
+            </div>
+          </p>
+        </div>
       ) : (
         <div className="p-6 border h-full flex flex-col items-center gap-y-6">
           <div className="flex items-center justify-center gap-2 w-full sm:w-3/4 lg:w-5/12 relative">
@@ -88,7 +108,7 @@ const ManagerApplication = () => {
               className="py-7 px-14 rounded-lg text-lg focus-visible:ring-customColor"
             />
           </div>
-          <div className="w-full h-[calc(100vh-17rem)] flex flex-col justify-between">
+          <div className="w-full h-[calc(100vh-18rem)] flex flex-col justify-between">
             <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-gray-100">

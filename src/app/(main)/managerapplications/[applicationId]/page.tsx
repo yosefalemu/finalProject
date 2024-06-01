@@ -79,9 +79,7 @@ const ApplicationDetail = ({
     trpc.manager.approveByManager.useMutation({
       onSuccess: () => {
         toast.success("Application is verified successfully");
-        setTimeout(() => {
-          router.push("/managerapplications");
-        }, 4000);
+        router.push("/managerapplications");
       },
       onError: (err) => {
         toast.error(err.message);
@@ -105,9 +103,7 @@ const ApplicationDetail = ({
     trpc.manager.rejectByManager.useMutation({
       onSuccess: () => {
         toast.success("Application is rejected successfully");
-        setTimeout(() => {
-          router.push("/managerapplications");
-        }, 4000);
+        router.push("/managerapplications");
       },
       onError: (err) => {
         toast.error(err.message);

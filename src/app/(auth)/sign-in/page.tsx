@@ -27,12 +27,16 @@ const SignIn = () => {
     useState<boolean>(true);
   const [url, setUrl] = useState<string>("");
   const isOrdinaryUser = searchParams.get("as") === "ordinaryUser";
+  const isAgent = searchParams.get("as") === "Agent";
   const [errorToDisplay, setErrorToDisplay] = useState<string | null>(null);
   const errorTimeoutRef = useRef<number | null>(null);
   const origin = searchParams.get("origin");
 
   const continueAsOrdinaryUser = () => {
     router.push("?as=ordinaryUser");
+  };
+  const continueAsAgent = () => {
+    router.push("?as=Agent");
   };
   const continueAsNormalUser = () => {
     setIsNationalIdVerified(true);
@@ -79,7 +83,7 @@ const SignIn = () => {
   const {
     isLoading: isLOadingForUser,
     mutate: mutateForUser,
-    isSuccess: isSuccessFOrUser,
+    isSuccess: isSuccessForUser,
   } = trpc.auth.signInUser.useMutation({
     onError: (err) => {
       setErrorToDisplay(err.message);
@@ -94,13 +98,33 @@ const SignIn = () => {
       router.push("/home");
     },
   });
+  //SIGNIN AS AGENT
+  const {
+    isLoading: isLOadingForAgent,
+    mutate: mutateForAgent,
+    isSuccess: isSuccessForAgent,
+  } = trpc.auth.signInAgent.useMutation({
+    onError: (err) => {
+      setErrorToDisplay(err.message);
+    },
 
+    onSuccess: ({}) => {
+      router.refresh();
+      // if (origin) {
+      //   router.push(`/${origin}`);
+      //   return;
+      // }
+      router.push("/agenthome");
+    },
+  });
   const onSubmit = ({ email, password }: TSignInCredentialValidator) => {
     setUrl(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/nationalid-verify?email=${email}`
     );
     if (isOrdinaryUser) {
       mutateForOrdinaryUser({ email, password });
+    } else if (isAgent) {
+      mutateForAgent({ email, password });
     } else {
       mutateForUser({ email, password });
     }
@@ -200,13 +224,19 @@ const SignIn = () => {
                   <p className="text-red-500">{errors.password.message}</p>
                 )}
               </div>
-              {isLoadingForOrdinaryUser || isLOadingForUser ? (
+              {isLoadingForOrdinaryUser ||
+              isLOadingForUser ||
+              isLOadingForAgent ? (
                 <Button
                   className={buttonVariants({
                     size: "lg",
                     className: "disabled:cursor-not-allowed",
                   })}
-                  disabled={isLoadingForOrdinaryUser || isLOadingForUser}
+                  disabled={
+                    isLoadingForOrdinaryUser ||
+                    isLOadingForUser ||
+                    isLOadingForAgent
+                  }
                 >
                   Processing
                   <Loader2
@@ -220,7 +250,11 @@ const SignIn = () => {
                     size: "lg",
                     className: "disabled:cursor-not-allowed",
                   })}
-                  disabled={isSuccessForOrdinaryUser || isSuccessFOrUser}
+                  disabled={
+                    isSuccessForOrdinaryUser ||
+                    isSuccessForUser ||
+                    isSuccessForAgent
+                  }
                 >
                   Sign in
                 </Button>
@@ -240,15 +274,15 @@ const SignIn = () => {
               </span>
             </div>
           </div>
-          {isOrdinaryUser ? (
-            <Button variant={"secondary"} onClick={continueAsNormalUser}>
-              Continue as normal user
-            </Button>
-          ) : (
-            <Button variant={"secondary"} onClick={continueAsOrdinaryUser}>
-              Continue as ordinary user
-            </Button>
-          )}
+          <Button variant={"secondary"} onClick={continueAsNormalUser}>
+            Continue as normal user
+          </Button>
+          <Button variant={"secondary"} onClick={continueAsAgent}>
+            Continue as Agent
+          </Button>
+          <Button variant={"secondary"} onClick={continueAsOrdinaryUser}>
+            Continue as ordinary user
+          </Button>
           {!isNationalIdVerified && (
             <Link
               href={url}

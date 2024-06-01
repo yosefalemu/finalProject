@@ -431,10 +431,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("agentLogoUrl");
-                        setAgentLogoFile;
-                      }}
+                      onChange={setAgentLogoFile}
                       onFilesAdded={async (addedFiles) => {
                         setAgentLogoFile([...agentLogoFile, ...addedFiles]);
                       }}
@@ -445,23 +442,15 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                     <div className="flex items-center justify-between">
                       <UploadButton
                         className="mt-2"
+                        type="button"
                         onClick={async () => {
                           await Promise.all(
                             agentLogoFile.map(async (fileState) => {
                               try {
-                                if (
-                                  fileState.progress !== "PENDING" ||
-                                  typeof fileState.file === "string"
-                                ) {
-                                  return;
-                                }
+                                if (fileState.progress !== "PENDING") return;
                                 const res =
                                   await edgestore.myPublicFiles.upload({
                                     file: fileState.file,
-                                    options: {
-                                      replaceTargetUrl:
-                                        applicationFound.agentLogoUrl,
-                                    },
                                     onProgressChange: async (progress) => {
                                       updateFileProgressForAgentLogo(
                                         fileState.key,
@@ -541,10 +530,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("profileUrl");
-                        setProfileFile;
-                      }}
+                      onChange={setProfileFile}
                       onFilesAdded={async (addedFiles) => {
                         setProfileFile([...profileFile, ...addedFiles]);
                       }}
@@ -654,10 +640,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("nationalIdUrls");
-                        setNationalIdFiles;
-                      }}
+                      onChange={setNationalIdFiles}
                       onFilesAdded={async (addedFiles) => {
                         setNationalIdFiles([
                           ...natioanalIdFiles,
@@ -769,10 +752,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("medicalUrls");
-                        setMedicalFiles;
-                      }}
+                      onChange={setMedicalFiles}
                       onFilesAdded={async (addedFiles) => {
                         setMedicalFiles([...medicalFiles, ...addedFiles]);
                       }}
@@ -879,10 +859,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("educationalUrls");
-                        setEducationalFile;
-                      }}
+                      onChange={setEducationalFile}
                       onFilesAdded={async (addedFiles) => {
                         setEducationalFile([...educationalFile, ...addedFiles]);
                       }}
@@ -988,10 +965,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("uniformDetailsUrls");
-                        setUniformDetailsFile;
-                      }}
+                      onChange={setUniformDetailsFile}
                       onFilesAdded={async (addedFiles) => {
                         setUniformDetailsFile([
                           ...uniformDetailsFile,
@@ -1105,10 +1079,7 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={() => {
-                        handleInputChange("employeeIdUrls");
-                        setEmployeeIdFile;
-                      }}
+                      onChange={setEmployeeIdFile}
                       onFilesAdded={async (addedFiles) => {
                         setEmployeeIdFile([...employeeIdFile, ...addedFiles]);
                       }}

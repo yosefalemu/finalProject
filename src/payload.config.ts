@@ -9,6 +9,8 @@ import { Application } from "./collections/application";
 import { Users } from "./collections/users";
 import { OrdinaryUser } from "./collections/ordinaryuser";
 import { OrdinaryNotification } from "./collections/ordinaryNotification";
+import { Agents } from "./collections/agent";
+import { Employee } from "./collections/employee";
 
 dotenv.config({
   path: path.resolve(__dirname, "../.env"),
@@ -16,7 +18,14 @@ dotenv.config({
 
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || "",
-  collections: [Users, OrdinaryUser, Application, OrdinaryNotification],
+  collections: [
+    Users,
+    OrdinaryUser,
+    Application,
+    OrdinaryNotification,
+    Agents,
+    Employee,
+  ],
   routes: {
     admin: "/admin",
   },

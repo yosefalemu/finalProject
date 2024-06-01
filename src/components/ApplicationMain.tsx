@@ -88,6 +88,7 @@ const ApplicationMain = () => {
       }
     };
   }, [errorToDisplay]);
+
   function updateFileProgressForAgentLogo(
     key: string,
     progress: FileState["progress"]
@@ -385,239 +386,212 @@ const ApplicationMain = () => {
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
+                      htmlFor="agentLogoUrl"
                       className="text-xl text-customColor font-normal"
                     >
                       Agent Logo
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={agentLogoFile}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("agentLogoUrl");
-                      setAgentLogoFile;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setAgentLogoFile([...agentLogoFile, ...addedFiles]);
-                    }}
-                  />
-                  <UploadButton
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        agentLogoFile.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForAgentLogo(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={agentLogoFile}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setAgentLogoFile}
+                      onFilesAdded={async (addedFiles) => {
+                        setAgentLogoFile([...agentLogoFile, ...addedFiles]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          agentLogoFile.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForAgentLogo(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("agentLogoUrl", res.url);
-                          } catch (err) {
-                            updateFileProgressForAgentLogo(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !agentLogoFile.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.agentLogoUrl && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.agentLogoUrl.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForAgentLogo(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("agentLogoUrl", res.url);
+                            } catch (err) {
+                              updateFileProgressForAgentLogo(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !agentLogoFile.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
+                      htmlFor="photoOfApplicant"
                       className="text-xl text-customColor font-normal"
                     >
-                      Photo of Applicant
+                      Photo Of Applicant
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={profileFile}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("profileUrl");
-                      setProfileFile;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setProfileFile([...profileFile, ...addedFiles]);
-                    }}
-                  />
-                  <UploadButton
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        profileFile.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForProfile(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={profileFile}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setProfileFile}
+                      onFilesAdded={async (addedFiles) => {
+                        setProfileFile([...profileFile, ...addedFiles]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          profileFile.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForProfile(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("profileUrl", res.url);
-                          } catch (err) {
-                            updateFileProgressForProfile(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !profileFile.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.profileUrl && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.profileUrl.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForProfile(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("profileUrl", res.url);
+                            } catch (err) {
+                              updateFileProgressForProfile(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !profileFile.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
                     <Label
-                      htmlFor="email"
+                      htmlFor="nationalIdUrls"
                       className="text-xl text-customColor font-normal"
                     >
-                      National Id (Front and back)
+                      National Ids
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={natioanalIdFiles}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("nationalIdUrls");
-                      setNationalIdFiles;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setNationalIdFiles([...natioanalIdFiles, ...addedFiles]);
-                    }}
-                  />
-                  <UploadButton
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        natioanalIdFiles.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForNationalId(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={natioanalIdFiles}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setNationalIdFiles}
+                      onFilesAdded={async (addedFiles) => {
+                        setNationalIdFiles([
+                          ...natioanalIdFiles,
+                          ...addedFiles,
+                        ]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          natioanalIdFiles.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForNationalId(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("nationalIdUrls", res.url);
-                          } catch (err) {
-                            updateFileProgressForNationalId(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !natioanalIdFiles.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.nationalIdUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.nationalIdUrls.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForNationalId(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("nationalIdUrls", res.url);
+                            } catch (err) {
+                              updateFileProgressForNationalId(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !natioanalIdFiles.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
               </div>
               <div className="w-fit">
@@ -627,78 +601,68 @@ const ApplicationMain = () => {
                       htmlFor="email"
                       className="text-xl text-customColor font-normal"
                     >
-                      Medical Certificate{" "}
+                      Medical Examination
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={medicalFiles}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("medicalUrls");
-                      setMedicalFiles;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setMedicalFiles([...medicalFiles, ...addedFiles]);
-                    }}
-                  />
-                  <UploadButton
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        medicalFiles.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForMedical(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={medicalFiles}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setMedicalFiles}
+                      onFilesAdded={async (addedFiles) => {
+                        setMedicalFiles([...medicalFiles, ...addedFiles]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          medicalFiles.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForMedical(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("medicalUrls", res.url);
-                          } catch (err) {
-                            updateFileProgressForMedical(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !medicalFiles.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.medicalUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.medicalUrls.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForMedical(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("medicalUrls", res.url);
+                            } catch (err) {
+                              updateFileProgressForMedical(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !medicalFiles.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
@@ -709,75 +673,65 @@ const ApplicationMain = () => {
                       Educational Certificates
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={educationalFile}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("educationalUrls");
-                      setEducationalFile;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setEducationalFile([...educationalFile, ...addedFiles]);
-                    }}
-                  />
-                  <UploadButton
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        educationalFile.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForEducational(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={educationalFile}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setEducationalFile}
+                      onFilesAdded={async (addedFiles) => {
+                        setEducationalFile([...educationalFile, ...addedFiles]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          educationalFile.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForEducational(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("educationalUrls", res.url);
-                          } catch (err) {
-                            updateFileProgressForEducational(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !educationalFile.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.educationalUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.educationalUrls.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForEducational(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("educationalUrls", res.url);
+                            } catch (err) {
+                              updateFileProgressForEducational(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !educationalFile.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
                 <div className="py-2">
                   <div className="flex items-center justify-between">
@@ -788,79 +742,68 @@ const ApplicationMain = () => {
                       Uniform Details (Front & Back)
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={uniformDetailsFile}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("uniformDetailsUrls");
-                      setUniformDetailsFile;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setUniformDetailsFile([
-                        ...uniformDetailsFile,
-                        ...addedFiles,
-                      ]);
-                    }}
-                  />
-                  <UploadButton
-                    type="button"
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        uniformDetailsFile.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForUniform(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={uniformDetailsFile}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setUniformDetailsFile}
+                      onFilesAdded={async (addedFiles) => {
+                        setUniformDetailsFile([
+                          ...uniformDetailsFile,
+                          ...addedFiles,
+                        ]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          uniformDetailsFile.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForUniform(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("uniformDetailsUrls", res.url);
-                          } catch (err) {
-                            updateFileProgressForUniform(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !uniformDetailsFile.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.uniformDetailsUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.uniformDetailsUrls.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForUniform(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("uniformDetailsUrls", res.url);
+                            } catch (err) {
+                              updateFileProgressForUniform(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !uniformDetailsFile.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
               </div>
               <div className="w-fit">
@@ -873,76 +816,65 @@ const ApplicationMain = () => {
                       Employee Id(Front & Back)
                     </Label>
                   </div>
-                  <MultiFileDropzone
-                    value={employeeIdFile}
-                    dropzoneOptions={{
-                      maxFiles: 1,
-                      maxSize: 1024 * 1024 * 1, // 1 MB
-                    }}
-                    onChange={() => {
-                      handleInputChange("employeeIdUrls");
-                      setEmployeeIdFile;
-                    }}
-                    onFilesAdded={async (addedFiles) => {
-                      setEmployeeIdFile([...employeeIdFile, ...addedFiles]);
-                    }}
-                  />
-                  <UploadButton
-                    type="button"
-                    className="mt-2"
-                    onClick={async () => {
-                      await Promise.all(
-                        employeeIdFile.map(async (fileState) => {
-                          try {
-                            if (
-                              fileState.progress !== "PENDING" ||
-                              typeof fileState.file === "string"
-                            ) {
-                              return;
-                            }
-                            const res = await edgestore.myPublicFiles.upload({
-                              file: fileState.file,
-                              onProgressChange: async (progress) => {
-                                updateFileProgressForEmployee(
-                                  fileState.key,
-                                  progress
-                                );
-                                if (progress === 100) {
-                                  // wait 1 second to set it to complete
-                                  // so that the user can see the progress bar
-                                  await new Promise((resolve) =>
-                                    setTimeout(resolve, 1000)
-                                  );
+                  <div className="flex flex-col items-start">
+                    <MultiFileDropzone
+                      value={agentLogoFile}
+                      dropzoneOptions={{
+                        maxFiles: 1,
+                        maxSize: 1024 * 1024 * 1, // 1 MB
+                      }}
+                      onChange={setAgentLogoFile}
+                      onFilesAdded={async (addedFiles) => {
+                        setAgentLogoFile([...agentLogoFile, ...addedFiles]);
+                      }}
+                    />
+                    <UploadButton
+                      className="mt-2"
+                      type="button"
+                      onClick={async () => {
+                        await Promise.all(
+                          employeeIdFile.map(async (fileState) => {
+                            try {
+                              if (fileState.progress !== "PENDING") return;
+                              const res = await edgestore.myPublicFiles.upload({
+                                file: fileState.file,
+                                onProgressChange: async (progress) => {
                                   updateFileProgressForEmployee(
                                     fileState.key,
-                                    "COMPLETE"
+                                    progress
                                   );
-                                }
-                              },
-                            });
-                            setValue("employeeIdUrls", res.url);
-                          } catch (err) {
-                            updateFileProgressForEmployee(
-                              fileState.key,
-                              "ERROR"
-                            );
-                          }
-                        })
-                      );
-                    }}
-                    disabled={
-                      !employeeIdFile.filter(
-                        (fileState) => fileState.progress === "PENDING"
-                      ).length
-                    }
-                  >
-                    Upload
-                  </UploadButton>
-                  {errors?.employeeIdUrls && (
-                    <p className="text-sm text-red-500 mt-2">
-                      {errors.employeeIdUrls.message}
-                    </p>
-                  )}
+                                  if (progress === 100) {
+                                    // wait 1 second to set it to complete
+                                    // so that the user can see the progress bar
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 1000)
+                                    );
+                                    updateFileProgressForEmployee(
+                                      fileState.key,
+                                      "COMPLETE"
+                                    );
+                                  }
+                                },
+                              });
+                              setValue("employeeIdUrls", res.url);
+                            } catch (err) {
+                              updateFileProgressForEmployee(
+                                fileState.key,
+                                "ERROR"
+                              );
+                            }
+                          })
+                        );
+                      }}
+                      disabled={
+                        !employeeIdFile.filter(
+                          (fileState) => fileState.progress === "PENDING"
+                        ).length
+                      }
+                    >
+                      Upload
+                    </UploadButton>
+                  </div>
                 </div>
               </div>
             </div>

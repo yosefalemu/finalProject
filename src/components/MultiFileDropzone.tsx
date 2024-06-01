@@ -1,5 +1,6 @@
 "use client";
 
+import { formatFileSize } from "@edgestore/react/utils";
 import {
   CheckCircleIcon,
   FileIcon,
@@ -52,11 +53,18 @@ const ERROR_MESSAGES = {
 
 const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { dropzoneOptions, value, className, disabled, onFilesAdded, onChange },
+    {
+      dropzoneOptions,
+      value = [],
+      className,
+      disabled,
+      onFilesAdded,
+      onChange,
+    },
     ref
   ) => {
     const [customError, setCustomError] = React.useState<string>();
-    if (dropzoneOptions?.maxFiles && value?.length) {
+    if (dropzoneOptions?.maxFiles && value.length) {
       disabled = disabled ?? value.length >= dropzoneOptions.maxFiles;
     }
     // dropzone configuration
@@ -74,19 +82,19 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
         setCustomError(undefined);
         if (
           dropzoneOptions?.maxFiles &&
-          (value?.length ?? 0) + files.length > dropzoneOptions.maxFiles
+          value.length + files.length > dropzoneOptions.maxFiles
         ) {
           setCustomError(ERROR_MESSAGES.tooManyFiles(dropzoneOptions.maxFiles));
           return;
         }
-        if (files) {
+        if (files.length) {
           const addedFiles = files.map<FileState>((file) => ({
             file,
             key: Math.random().toString(36).slice(2),
             progress: "PENDING",
           }));
           void onFilesAdded?.(addedFiles);
-          void onChange?.([...(value ?? []), ...addedFiles]);
+          void onChange?.([...value, ...addedFiles]);
         }
       },
       ...dropzoneOptions,
@@ -99,7 +107,7 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
           variants.base,
           isFocused && variants.active,
           disabled && variants.disabled,
-          (isDragReject ?? fileRejections[0]) && variants.reject,
+          (isDragReject || fileRejections.length > 0) && variants.reject,
           isDragAccept && variants.accept,
           className
         ).trim(),
@@ -115,7 +123,7 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
 
     // error validation messages
     const errorMessage = React.useMemo(() => {
-      if (fileRejections[0]) {
+      if (fileRejections.length > 0) {
         const { errors } = fileRejections[0];
         if (errors[0]?.code === "file-too-large") {
           return ERROR_MESSAGES.fileTooLarge(dropzoneOptions?.maxSize ?? 0);
@@ -156,7 +164,7 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
           </div>
 
           {/* Selected Files */}
-          {value?.map(({ file, progress }, i) => (
+          {value.map(({ file, progress }, i) => (
             <div
               key={i}
               className="flex h-16 w-96 max-w-[100vw] flex-col justify-center rounded border border-gray-300 px-4 py-2"
@@ -175,15 +183,18 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
                 <div className="flex w-12 justify-end text-xs">
                   {progress === "PENDING" ? (
                     <button
-                      type="button"
+                      type="reset"
                       className="rounded-md p-1 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => {
-                        void onChange?.(
-                          value.filter((_, index) => index !== i)
+                        const newValue = value.filter(
+                          (_, index) => index !== i
                         );
+                        if (onChange) {
+                          onChange(newValue);
+                        }
                       }}
                     >
-                      <Trash2Icon className="shrink-0" />
+                      <Trash2Icon className="shrink-0 text-red-500" />
                     </button>
                   ) : progress === "ERROR" ? (
                     <LucideFileWarning className="shrink-0 text-red-600 dark:text-red-400" />
@@ -215,20 +226,5 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
   }
 );
 MultiFileDropzone.displayName = "MultiFileDropzone";
-
-function formatFileSize(bytes?: number) {
-  if (!bytes) {
-    return "0 Bytes";
-  }
-  bytes = Number(bytes);
-  if (bytes === 0) {
-    return "0 Bytes";
-  }
-  const k = 1024;
-  const dm = 2;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
 
 export { MultiFileDropzone };

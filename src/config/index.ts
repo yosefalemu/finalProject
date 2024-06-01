@@ -47,3 +47,19 @@ export const SidebarComponents: TSidebarItemsType[] = [
   { name: "Apply Instructions", url: "ApplyInstructions", icon: ScrollText },
   { name: "Apply", url: "ApplyMain", icon: ShieldPlus },
 ];
+
+export const AgentComponents: TSidebarItemsType[] = [
+  { name: "Home", url: "Agent Home", icon: Home },
+  {
+    name: "Profile",
+    url: "AgentProfile",
+    icon: UserRound,
+  },
+  { name: "Employees", url: "AgentEmployees", icon: Briefcase },
+  { name: "Add Employee", url: "AddEmployee", icon: ShieldPlus },
+  {
+    name: "Chat",
+    url: "AgentChat",
+    icon: MessageSquareMore,
+  },
+];

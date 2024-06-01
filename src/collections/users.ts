@@ -64,6 +64,11 @@ export const Users: CollectionConfig = {
         { label: "Admin", value: "admin" },
       ],
     },
+    {
+      name: "dateOfBirth",
+      type: "date",
+      required: true,
+    },
     { name: "profile", type: "text" },
     {
       name: "city",
@@ -85,6 +90,16 @@ export const Users: CollectionConfig = {
       type: "relationship",
       relationTo: "users",
       hasMany: false,
+    },
+    {
+      name: "permission",
+      type: "select",
+      required: true,
+      options: [
+        { label: "Allowed", value: "allowed" },
+        { label: "Rejected", value: "rejected" },
+      ],
+      defaultValue: "allowed",
     },
   ],
 };

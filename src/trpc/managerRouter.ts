@@ -87,12 +87,6 @@ export const managerRouter = router({
       //UPDATE FOR THE AGENT URL
       if (controller === "agentLogoUrl") {
         if (approved) {
-          if (!message || message?.length < 30) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: "Please provide elaborative rejection reason",
-            });
-          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -102,6 +96,12 @@ export const managerRouter = router({
             },
           });
         } else {
+          if (!message || message?.length < 30) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Please provide elaborative rejection reason",
+            });
+          }
           await payload.update({
             collection: "applications",
             id: applicationId,
@@ -326,7 +326,53 @@ export const managerRouter = router({
           message: "Uniform detail is not approved yet!",
         });
       } else {
-        //   CREATE AGENT AND SEND THE CREDENTIAL THOUGH THE SYSTEM
+        const { user } = ctx;
+        function generateStrongPassword() {
+          const uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+          const lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+          const numbers = "0123456789";
+          const specialCharacters = "!@#$%^&*()_+[]{}|;:,.<>?";
+
+          const allCharacters =
+            uppercaseLetters + lowercaseLetters + numbers + specialCharacters;
+          let password = "";
+
+          for (let i = 0; i < 8; i++) {
+            const randomIndex = Math.floor(
+              Math.random() * allCharacters.length
+            );
+            password += allCharacters[randomIndex];
+          }
+
+          return password;
+        }
+
+        const password = generateStrongPassword();
+        const applier = applicationFound.applier as OrdinaryUser;
+        await payload.create({
+          collection: "agents",
+          data: {
+            application: applicationId,
+            agentAdmin: applier.id,
+            email: applier.email,
+            password: password,
+            randomPassword: password,
+          },
+        });
+        await payload.create({
+          collection: "ordinaryNotification",
+          data: {
+            application: applicationId,
+            reciever: applier.id as string,
+            sender: user.id,
+            message: `Congratulations! Dear ${applier.firstName} ${applier.middleName} ${applier.lastName} your application has been successfully accepted. Please visit our office to receive your certificate and login credentials. You can then continue as an agent.`,
+          },
+        });
+        await payload.update({
+          collection: "applications",
+          id: applicationId,
+          data: { responseOfManager: "approved" },
+        });
       }
     }),
   rejectByManager: privateProcedure
