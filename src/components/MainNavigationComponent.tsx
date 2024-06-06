@@ -14,14 +14,6 @@ const MainNavigationComponentsItem = ({
   // const pathname = usePathname();
   const pathname = usePathname().split("/")[1].toLowerCase();
   console.log("PATH NAME", pathname);
-
-  const handleLogout = () => {
-    document.cookie =
-      "payload-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    localStorage.removeItem("logged-in-user");
-    localStorage.removeItem("refresh-state");
-    window.location.href = "/sign-in";
-  };
   return (
     <div className="flex items-center justify-center gap-x-4 bg-customColor">
       {MainSidebarComponents.map((item, index) => (

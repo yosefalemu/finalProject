@@ -448,4 +448,48 @@ export const managerRouter = router({
         },
       });
     }),
+  getAllUsers: privateProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100),
+        cursor: z.number().nullish(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { cursor, limit } = input;
+      const { user } = ctx;
+      console.log("LIMIT IN PAYLOAD", limit);
+
+      const payload = await getPayloadClient();
+
+      const page = cursor || 1;
+
+      const {
+        docs: items,
+        hasNextPage,
+        nextPage,
+      } = await payload.find({
+        collection: "users",
+        depth: 1,
+        limit,
+        page,
+      });
+      console.log("FOUND APPLICATION", items);
+
+      return {
+        items,
+        nextPage: hasNextPage ? nextPage : null,
+      };
+    }),
+  getSingleUser: privateProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      const { userId } = input;
+      const payload = await getPayloadClient();
+      const userFound = await payload.findByID({
+        collection: "users",
+        id: userId,
+      });
+      return { success: true, userFound: userFound };
+    }),
 });

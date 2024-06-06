@@ -4,6 +4,7 @@ import { getPayloadClient } from "../get-payload";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { SignInCredentialValidator } from "../validators/sigin-validators";
+import { UpdateUserProfile } from "../validators/update-profile";
 
 export const authRouter = router({
   createOrdinaryUser: publicProcedure
@@ -205,7 +206,7 @@ export const authRouter = router({
         });
       }
       try {
-        await payload.login({
+        const logedInUser = await payload.login({
           collection: "users",
           data: {
             email,
@@ -213,13 +214,13 @@ export const authRouter = router({
           },
           res,
         });
+        return { success: true, loggedInUserId: logedInUser.user.id };
       } catch (error) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Incorrect password",
         });
       }
-      return { success: true };
     }),
   signInAgent: publicProcedure
     .input(SignInCredentialValidator)
@@ -254,7 +255,7 @@ export const authRouter = router({
         });
       }
       try {
-        await payload.login({
+        const logedInUser = await payload.login({
           collection: "agents",
           data: {
             email,
@@ -262,13 +263,13 @@ export const authRouter = router({
           },
           res,
         });
+        return { success: true, loggedInUserId: logedInUser.user.id };
       } catch (error) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Incorrect password",
         });
       }
-      return { success: true };
     }),
   verifyNationalId: publicProcedure
     .input(z.object({ email: z.string(), nationalId: z.string() }))
@@ -310,5 +311,33 @@ export const authRouter = router({
       } else {
         throw new TRPCError({ code: "BAD_REQUEST", message: "User not found" });
       }
+    }),
+  getUserProfile: privateProcedure.query(async ({ ctx }) => {
+    const { user } = ctx;
+    const payload = await getPayloadClient();
+    const userFound = await payload.findByID({
+      collection: "users",
+      id: user.id,
+    });
+    return { userFound };
+  }),
+  updateProfile: privateProcedure
+    .input(UpdateUserProfile)
+    .mutation(async ({ input, ctx }) => {
+      const { profile, phoneNumber, email, city, woreda, kebele } = input;
+      const { user } = ctx;
+      const payload = await getPayloadClient();
+      await payload.update({
+        collection: "users",
+        id: user.id,
+        data: {
+          profile,
+          phoneNumber,
+          email,
+          city,
+          woreda,
+          kebele,
+        },
+      });
     }),
 });

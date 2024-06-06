@@ -30,6 +30,7 @@ export const Agents: CollectionConfig = {
       hasMany: false,
       required: true,
     },
+    { name: "profile", type: "text" },
     {
       name: "permission",
       type: "select",

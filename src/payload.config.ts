@@ -11,6 +11,8 @@ import { OrdinaryUser } from "./collections/ordinaryuser";
 import { OrdinaryNotification } from "./collections/ordinaryNotification";
 import { Agents } from "./collections/agent";
 import { Employee } from "./collections/employee";
+import { MainConversation } from "./collections/mainConversation";
+import { MainMessage } from "./collections/mainMessage";
 
 dotenv.config({
   path: path.resolve(__dirname, "../.env"),
@@ -25,6 +27,8 @@ export default buildConfig({
     OrdinaryNotification,
     Agents,
     Employee,
+    MainConversation,
+    MainMessage,
   ],
   routes: {
     admin: "/admin",

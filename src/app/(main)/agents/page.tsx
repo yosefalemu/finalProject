@@ -120,6 +120,8 @@ const Agents = () => {
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
             </div>
             <div className="flex justify-center gap-x-4">
               <Skeleton className="h-8 w-10" />
@@ -144,7 +146,7 @@ const Agents = () => {
                 />
               </div>
               <h1 className="text-customColor text-xl">
-                There is no agent registered yet.
+                There is no employee registered yet.
               </h1>
             </div>
           </p>
@@ -244,12 +246,17 @@ const Agents = () => {
                       </TableCell>
                       <TableCell
                         className="text-right"
-                        onClick={() => router.push(`/agents/${item.id}`)}
+                        onClick={() =>
+                          router.push(
+                            `/agents/${(item.application as Application).id}`
+                          )
+                        }
                       >
                         <div className="flex items-center justify-center text-green-500 cursor-pointer">
                           <ReceiptText />
                         </div>
                       </TableCell>
+
                       <TableCell className="text-right">
                         <div className="flex items-center justify-center cursor-pointer">
                           {item.permission === "pending" ? (
@@ -292,7 +299,7 @@ const Agents = () => {
                               <DialogContent className="sm:max-w-[750px] flex flex-col">
                                 <DialogHeader>
                                   <DialogTitle className="text-3xl text-customColor text-center font-semibold">
-                                    Reject Agent Logo
+                                    Access denied
                                   </DialogTitle>
                                   <DialogDescription className="text-center text-lg">
                                     Provide clear reason for access Denied

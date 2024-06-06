@@ -64,6 +64,8 @@ const ManagerApplication = () => {
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
             </div>
             <div className="flex justify-center gap-x-4">
               <Skeleton className="h-8 w-10" />

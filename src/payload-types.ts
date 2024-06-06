@@ -14,6 +14,8 @@ export interface Config {
     ordinaryNotification: OrdinaryNotification;
     agents: Agent;
     employee: Employee;
+    mainConversation: MainConversation;
+    mainMessage: MainMessage;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -144,6 +146,7 @@ export interface Agent {
   agentAdmin: string | OrdinaryUser;
   randomPassword: string;
   application: string | Application;
+  profile?: string | null;
   permission?: ('pending' | 'allowed' | 'rejected') | null;
   updatedAt: string;
   createdAt: string;
@@ -197,6 +200,30 @@ export interface Employee {
   status?: ('employeed' | 'free') | null;
   activeAgent?: (string | null) | Agent;
   prevAgents: (string | Agent)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mainConversation".
+ */
+export interface MainConversation {
+  id: string;
+  members?: (string | User)[] | null;
+  participants?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mainMessage".
+ */
+export interface MainMessage {
+  id: string;
+  conversationId?: (string | null) | MainConversation;
+  sender?: (string | null) | User;
+  message?: string | null;
+  isViewed?: ('unViewed' | 'viewed') | null;
   updatedAt: string;
   createdAt: string;
 }

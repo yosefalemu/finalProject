@@ -27,6 +27,7 @@ import {
   ReceiptText,
   Search,
   Shield,
+  ShieldBan,
   ShieldCheck,
   ThumbsDown,
   ThumbsUpIcon,
@@ -54,27 +55,14 @@ import { RejectAgent, TRejectAgent } from "@/validators/agent-validators";
 
 const AgentEmployees = () => {
   const router = useRouter();
-  const { data, isLoading } = trpc.agent.getAgents.useInfiniteQuery({
+  const { data, isLoading } = trpc.employee.getAgentEmployees.useInfiniteQuery({
     limit: 10,
   });
   const agents = data?.pages[0].items;
   console.log("AGENT FOUND", agents);
 
-  const { register, watch, reset } = useForm<TRejectAgent>({
-    resolver: zodResolver(RejectAgent),
-  });
-
-  const { mutate: verifyForFirstTime, isLoading: loadingVerifyAgentFirst } =
-    trpc.agent.verifyAgentFirstTime.useMutation({
-      onSuccess: () => {
-        toast.success("Agent verification successful.");
-      },
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    });
-  const { mutate: verifyAgent, isLoading: loadingVerifyAgent } =
-    trpc.agent.verifyAgent.useMutation({
+  const { mutate, isLoading: loadingFireEmployee } =
+    trpc.employee.fireEmployee.useMutation({
       onSuccess: () => {
         toast.success("Agent access restored.");
       },
@@ -82,26 +70,9 @@ const AgentEmployees = () => {
         toast.error(err.message);
       },
     });
-  const { mutate: rejectAgent, isLoading: loadingRejectAgent } =
-    trpc.agent.rejectAgent.useMutation({
-      onSuccess: () => {
-        toast.success("Agent access Denied.");
-        reset({ rejectionReason: "" });
-      },
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    });
 
-  const verifyAgentFun = (agentId: string, firstTime: boolean) => {
-    if (firstTime) {
-      verifyForFirstTime({ agentId });
-    } else {
-      verifyAgent({ agentId });
-    }
-  };
-  const rejectAgentFun = (agentId: string, rejectionReason: string) => {
-    rejectAgent({ agentId, rejectionReason });
+  const fireEmployee = (employeeId: string) => {
+    mutate({ employeeId });
   };
 
   return (
@@ -114,6 +85,8 @@ const AgentEmployees = () => {
           <div className="flex flex-col justify-between w-full h-[calc(100vh-17rem)] ">
             <div className="flex flex-col gap-y-4 w-full h-full">
               <Skeleton className="h-14 w-full bg-gray-300" />
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
@@ -168,9 +141,6 @@ const AgentEmployees = () => {
             <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-gray-100">
-                  <TableHead className="text-lg text-customColor">
-                    Agent Name
-                  </TableHead>
                   <TableHead className="text-lg text-center text-customColor">
                     First Name
                   </TableHead>
@@ -181,70 +151,70 @@ const AgentEmployees = () => {
                     Last Name
                   </TableHead>
                   <TableHead className="text-lg text-center text-customColor">
+                    Sex
+                  </TableHead>
+                  <TableHead className="text-lg text-center text-customColor">
+                    Age
+                  </TableHead>
+                  <TableHead className="text-lg text-center text-customColor">
+                    Region
+                  </TableHead>
+                  <TableHead className="text-lg text-center text-customColor">
+                    City
+                  </TableHead>
+                  <TableHead className="text-lg text-center text-customColor">
+                    Position
+                  </TableHead>
+                  <TableHead className="text-lg text-center text-customColor">
                     Phone
-                  </TableHead>
-                  <TableHead className="text-lg text-center text-customColor">
-                    Status
-                  </TableHead>
-                  <TableHead className="text-lg text-center text-customColor">
-                    Employees
                   </TableHead>
                   <TableHead className="text-lg text-center text-customColor">
                     Details
                   </TableHead>
                   <TableHead className="text-lg text-center text-customColor">
-                    Verify
+                    Fire
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {agents!.map((item, index) => {
-                  const agentData = item.application as Application;
-                  const agentAdminData = agentData.applier as OrdinaryUser;
-                  console.log("AGENT ADMIN DATA", agentAdminData);
-                  console.log("AGENT DATA", agentData);
-
                   return (
                     <TableRow
                       key={index}
                       className={`${index % 2 === 0 ? "" : "bg-gray-100"}`}
                     >
-                      <TableCell>{agentData.agentName}</TableCell>
                       <TableCell className="text-center text-customColor">
-                        {agentAdminData.firstName}
-                      </TableCell>
-                      <TableCell className="text-center text-customColor">
-                        {agentAdminData.middleName}
+                        {item.firstName}
                       </TableCell>
                       <TableCell className="text-center text-customColor">
-                        {agentAdminData.lastName}
+                        {item.middleName}
                       </TableCell>
                       <TableCell className="text-center text-customColor">
-                        {agentAdminData.phoneNumber}
+                        {item.lastName}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center cursor-pointer">
-                          {item.permission === "pending" ? (
-                            <CircleEllipsis className="text-customColorFour" />
-                          ) : item.permission === "allowed" ? (
-                            <ThumbsUpIcon className="text-green-500" />
-                          ) : (
-                            <ThumbsDown className="text-red-700" />
-                          )}
-                        </div>
+                      <TableCell className="text-center text-customColor">
+                        {item.sex}
                       </TableCell>
-                      <TableCell
-                        onClick={() =>
-                          router.push(`/agents/employees/${item.id}`)
-                        }
-                      >
-                        <div className="flex items-center justify-center cursor-pointer">
-                          <Briefcase className="text-customColor" />
-                        </div>
+                      <TableCell className="text-center text-customColor">
+                        {item.age}
+                      </TableCell>
+                      <TableCell className="text-center text-customColor">
+                        {item.regionofemployment}
+                      </TableCell>
+                      <TableCell className="text-center text-customColor">
+                        {item.cityofemployment}
+                      </TableCell>
+                      <TableCell className="text-center text-customColor">
+                        {item.employmentposition}
+                      </TableCell>
+                      <TableCell className="text-center text-customColor">
+                        {item.phoneNumber}
                       </TableCell>
                       <TableCell
                         className="text-right"
-                        onClick={() => router.push(`/agents/${item.id}`)}
+                        onClick={() =>
+                          router.push(`/agentemployees/${item.id}`)
+                        }
                       >
                         <div className="flex items-center justify-center text-green-500 cursor-pointer">
                           <ReceiptText />
@@ -252,107 +222,35 @@ const AgentEmployees = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-center cursor-pointer">
-                          {item.permission === "pending" ? (
-                            <Dialog>
-                              <DialogTrigger>
-                                <ShieldCheck className="text-green-500" />
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-fit h-fit p-4 flex flex-col">
-                                <DialogHeader>
-                                  <DialogDescription className="text-center text-lg">
-                                    Are you sure?
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter className="pt-5 flex items-center justify-center">
-                                  <Button
-                                    type="button"
-                                    className="px-10 bg-red-600 hover:bg-red-800"
-                                    disabled={loadingVerifyAgentFirst}
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    type="submit"
-                                    className="px-10"
-                                    onClick={() =>
-                                      verifyAgentFun(item.id, true)
-                                    }
-                                    disabled={loadingVerifyAgentFirst}
-                                  >
-                                    Confirm
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          ) : item.permission === "allowed" ? (
-                            <Dialog>
-                              <DialogTrigger>
-                                <Shield className="text-red-700" />
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[750px] flex flex-col">
-                                <DialogHeader>
-                                  <DialogTitle className="text-3xl text-customColor text-center font-semibold">
-                                    Reject Agent Logo
-                                  </DialogTitle>
-                                  <DialogDescription className="text-center text-lg">
-                                    Provide clear reason for access Denied
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <Textarea
-                                  {...register("rejectionReason")}
-                                  className="focus-visible:ring-customColor"
-                                  placeholder="Type reject reason or approval message"
-                                />
-                                <DialogFooter className="pt-5">
-                                  <Button
-                                    type="button"
-                                    className="px-10 bg-red-600 hover:bg-red-800"
-                                    onClick={() => {
-                                      rejectAgentFun(
-                                        item.id,
-                                        watch("rejectionReason")
-                                      );
-                                    }}
-                                    disabled={loadingRejectAgent}
-                                  >
-                                    Confirm
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          ) : (
-                            <Dialog>
-                              <DialogTrigger>
-                                <ShieldCheck className="text-green-500 " />
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-fit h-fit p-4 flex flex-col">
-                                <DialogHeader>
-                                  <DialogDescription className="text-center text-lg">
-                                    Are you sure?
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter className="pt-5 flex items-center justify-center">
-                                  <Button
-                                    type="button"
-                                    className="px-10 bg-red-600 hover:bg-red-800"
-                                    disabled={loadingVerifyAgent}
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    type="submit"
-                                    className="px-10"
-                                    onClick={() =>
-                                      verifyAgentFun(item.id, false)
-                                    }
-                                    disabled={loadingVerifyAgent}
-                                  >
-                                    Confirm
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          )}
+                          <Dialog>
+                            <DialogTrigger>
+                              <ShieldBan className="text-red-500" />
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-fit h-fit p-4 flex flex-col">
+                              <DialogHeader>
+                                <DialogDescription className="text-center text-lg">
+                                  Are you sure?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter className="pt-5 flex items-center justify-center">
+                                <Button
+                                  type="button"
+                                  className="px-10 bg-red-600 hover:bg-red-800"
+                                  disabled={loadingFireEmployee}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  type="submit"
+                                  className="px-10"
+                                  onClick={() => fireEmployee(item.id)}
+                                  disabled={loadingFireEmployee}
+                                >
+                                  Confirm
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </TableCell>
                     </TableRow>

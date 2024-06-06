@@ -62,6 +62,8 @@ const ScreenerApplication = () => {
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
             </div>
             <div className="flex justify-center gap-x-4">
               <Skeleton className="h-8 w-10" />
@@ -107,7 +109,7 @@ const ScreenerApplication = () => {
             />
           </div>
           <div className="w-full h-[calc(100vh-18rem)] flex flex-col justify-between">
-            <Table className="w-full border border-violet-600">
+            <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-gray-100">
                   <TableHead className="text-lg text-customColor">

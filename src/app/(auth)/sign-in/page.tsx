@@ -88,14 +88,14 @@ const SignIn = () => {
     onError: (err) => {
       setErrorToDisplay(err.message);
     },
-
-    onSuccess: ({}) => {
+    onSuccess: ({ loggedInUserId }) => {
+      addUserId(loggedInUserId);
       router.refresh();
+      router.push("/home");
       // if (origin) {
       //   router.push(`/${origin}`);
       //   return;
       // }
-      router.push("/home");
     },
   });
   //SIGNIN AS AGENT
@@ -107,14 +107,14 @@ const SignIn = () => {
     onError: (err) => {
       setErrorToDisplay(err.message);
     },
-
-    onSuccess: ({}) => {
+    onSuccess: ({ loggedInUserId }) => {
+      addUserId(loggedInUserId);
       router.refresh();
+      router.push("/agenthome");
       // if (origin) {
       //   router.push(`/${origin}`);
       //   return;
       // }
-      router.push("/agenthome");
     },
   });
   const onSubmit = ({ email, password }: TSignInCredentialValidator) => {

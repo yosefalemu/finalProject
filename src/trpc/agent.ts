@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { privateProcedure, router } from "./trpc";
+import { privateProcedure, privateProcedureAgent, router } from "./trpc";
 import { getPayloadClient } from "../get-payload";
 import { Application, OrdinaryUser } from "@/payload-types";
+import { UpdateUserProfile } from "../validators/update-profile";
 
 export const agentRouter = router({
   getAgents: privateProcedure
@@ -131,6 +132,36 @@ export const agentRouter = router({
           reciever: (await agentFound).id,
           message: rejectionReason,
           application: application.id as string,
+        },
+      });
+    }),
+  getUserProfile: privateProcedureAgent.query(async ({ ctx }) => {
+    const { user } = ctx;
+    const payload = await getPayloadClient();
+    const userId = (user.agentAdmin as OrdinaryUser).id;
+    const userFound = await payload.findByID({
+      collection: "ordinaryUser",
+      id: userId,
+    });
+    return { userFound };
+  }),
+  updateProfile: privateProcedureAgent
+    .input(UpdateUserProfile)
+    .mutation(async ({ input, ctx }) => {
+      const { profile, phoneNumber, email, city, woreda, kebele } = input;
+      const { user } = ctx;
+      const userId = (user.agentAdmin as OrdinaryUser).id;
+      const payload = await getPayloadClient();
+      await payload.update({
+        collection: "ordinaryUser",
+        id: userId,
+        data: {
+          profile,
+          phoneNumber,
+          email,
+          city,
+          woreda,
+          kebele,
         },
       });
     }),
