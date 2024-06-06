@@ -26,6 +26,7 @@ export const MainMessage: CollectionConfig = {
         { label: "notViewed", value: "unViewed" },
         { label: "viewed", value: "viewed" },
       ],
+      defaultValue:"unViewed"
     },
   ],
 };

@@ -21,6 +21,7 @@ const ConversationList = ({
       typeof item !== "string" && item.id !== userId
   );
 
+  // Fetch the user messages to get user's latest message
   const {
     data: userMessages,
     isLoading: isLoadingForUserMessages,
@@ -44,10 +45,36 @@ const ConversationList = ({
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )[0];
 
+  // Fetch to get unviewed user messages
+  const {
+    data: unViwedMessagesData,
+    refetch: fetchUnViewedMessages,
+    isLoading: isLoadingFetchUnviewedMessages,
+  } = trpc.message.getUnViewedMessage.useQuery({
+    conversationId: conversations.id,
+  });
+
+  console.log("UNVIWED MESSAGES", unViwedMessagesData);
+
+  // Update the message which is viewed
+  const { mutate: updateMessageView } =
+    trpc.message.updateMessageView.useMutation({
+      onSuccess: () => {
+        fetchUnViewedMessages();
+      },
+    });
+
+  const updateMessageViewFun = () => {
+    updateMessageView({ conversationId: conversations.id });
+  };
+
   return (
     <div
-      className="bg-gray-200 flex items-center gap-x-8 p-2 rounded-sm cursor-pointer"
-      onClick={() => setSelectedConversationId(conversations.id)}
+      className="bg-gray-200 flex items-center gap-x-8 p-2 rounded-sm cursor-pointer relative"
+      onClick={() => {
+        setSelectedConversationId(conversations.id);
+        updateMessageViewFun();
+      }}
     >
       <div className="relative h-16 w-16 rounded-full overflow-hidden">
         <Image
@@ -72,6 +99,19 @@ const ConversationList = ({
           </p>
         </div>
       </div>
+      {!isLoadingFetchUnviewedMessages ? (
+        <div
+          className={`flex items-center justify-center bg-red-500 rounded-full p-3 text-sm h-4 w-4 absolute top-2 right-2 ${
+            unViwedMessagesData?.unviewedMessages.length === 0
+              ? "hidden"
+              : "block"
+          }`}
+        >
+          <p className="text-white text-sm">
+            {unViwedMessagesData?.unviewedMessages.length}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 };

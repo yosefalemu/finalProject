@@ -145,7 +145,7 @@ const Profile = () => {
                 fill
                 src={
                   userProfile?.userFound.profile ||
-                  "/mainImages/profileMain.png"
+                  "/mainImages/noprofile.png"
                 }
                 alt="PROFILEPICTURE"
                 className="object-cover"

@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { trpc } from "@/trpc/client";
+import { useEffect } from "react";
 
 const MainNavBar = () => {
   const handleLogout = () => {
@@ -21,7 +23,16 @@ const MainNavBar = () => {
     localStorage.removeItem("refresh-state");
     window.location.href = "/sign-in";
   };
+  const { data: userProfile, refetch } = trpc.auth.getUserProfile.useQuery();
+  // Refetch data every 1 minute (60,000 milliseconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 10000);
 
+    // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
+  }, [refetch]);
   return (
     <MaxWidthWrapper>
       <div className="flex items-center justify-between w-full">
@@ -39,10 +50,13 @@ const MainNavBar = () => {
           <Notification />
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <div className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-customColorThree">
+              <div className="relative w-16 h-16 rounded-full overflow-hidden border-1 border-customColorThree">
                 <Image
                   fill
-                  src={"/mainImages/profile.png"}
+                  src={
+                    userProfile?.userFound.profile ||
+                    "/mainImages/noprofile.png"
+                  }
                   alt="LOGOIMAGES"
                   className="object-cover"
                 />

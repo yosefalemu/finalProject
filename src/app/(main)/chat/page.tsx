@@ -36,14 +36,21 @@ const Chat = () => {
     });
   const allUsersFound = allUsers?.pages[0].availableUsers;
   //FETCH THE USERS PREVIOUS CONVERSATIONS
-  const { data, isLoading, isError } =
-    trpc.conversation.getUserConversation.useQuery();
-  const conversations = data?.items;
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch: fetchUserConversation,
+  } = trpc.conversation.getUserConversation.useQuery();
+  const conversations = data?.items.sort(
+    (a: MainConversation, b: MainConversation) =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  );
   //CREATE NEW CONVERSATION FOR THE USER
   const { mutate, isLoading: isLoadingCreateConversation } =
     trpc.conversation.createConversation.useMutation({
       onSuccess: () => {
-        console.log("conversation created");
+        fetchUserConversation();
       },
     });
   const createConversation = (recieverId: string) => {
@@ -60,7 +67,7 @@ const Chat = () => {
       conversationId: selectedConversationId,
     },
     {
-      enabled: false, // Disable automatic fetching
+      enabled: false,
     }
   );
 
@@ -85,6 +92,18 @@ const Chat = () => {
       typeof item !== "string" && item.id !== userId
   );
 
+  //UPDATE THE CONVERSATION WHILE THE MESSAGE IS CREATED
+  const { mutate: updateConversation } =
+    trpc.conversation.updateConversation.useMutation({
+      onSuccess: () => {
+        fetchUserConversation();
+      },
+    });
+  const updateConversationFun = () => {
+    if (selectedConversationId) {
+      updateConversation({ conversationId: selectedConversationId });
+    }
+  };
   //CREATE MESSAGES
   const {
     mutate: createMessage,
@@ -94,6 +113,7 @@ const Chat = () => {
     onSuccess: () => {
       fetchUserMessages();
       setTypedMessage(null);
+      updateConversationFun();
     },
   });
   const createMessageFun = (conversationId: string, message: string) => {
@@ -220,8 +240,8 @@ const Chat = () => {
                       className="object-contain"
                     />
                   </div>
-                  <h1 className="text-2xl text-customColor">
-                    No conversation yet!
+                  <h1 className="text-lg text-customColor">
+                    create conversation and start chat!🔥
                   </h1>
                 </div>
               ) : (
@@ -285,7 +305,7 @@ const Chat = () => {
                       ERORR
                     </div>
                   ) : userSelectedMessages?.length === 0 ? (
-                    <div className="bg-gray-100 border border-gray-200 rounded-sm flex flex-col p-3 gap-y-3 h-full">
+                    <div className="bg-white border border-gray-200 rounded-sm flex flex-col p-3 gap-y-3 h-full">
                       <div className="text-customColor text-lg text-center flex items-center justify-center w-full h-full">
                         <div className="flex flex-col">
                           <h1 className="text-lg">No conversation yet!</h1>
