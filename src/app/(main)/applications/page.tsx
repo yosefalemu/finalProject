@@ -88,7 +88,7 @@ const ScreenerApplication = () => {
                 />
               </div>
               <h1 className="text-customColor text-xl">
-                You haven't received any applications yet.
+                You haven&apos;t received any applications yet.
               </h1>
             </div>
           </p>

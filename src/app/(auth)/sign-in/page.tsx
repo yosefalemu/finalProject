@@ -161,7 +161,7 @@ const SignIn = () => {
             href={"/registor-as-agent"}
             className={buttonVariants({ variant: "link", className: "gap-1" })}
           >
-            Don't have an account
+            Don&apos;t have an account
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

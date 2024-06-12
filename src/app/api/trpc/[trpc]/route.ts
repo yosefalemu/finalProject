@@ -4,9 +4,10 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 const handler = (req: Request) => {
   fetchRequestHandler({
     endpoint: "/api/trpc",
-    req: req,
+    req,
     router: appRouter,
-    createContext: () => (),
+    // @ts-expect-error context already passed from express middleware
+    createContext: () => ({}),
   });
 };
 

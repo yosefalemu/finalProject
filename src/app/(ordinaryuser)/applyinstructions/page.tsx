@@ -56,16 +56,16 @@ const ApplyInstructions = async () => {
                         2. Applicant National Id
                       </h1>
                       <h1 className="text-xl font-thin">
-                        4. Applicant's Medical Certificate
+                        4. Applicant&apos;s Medical Certificate
                       </h1>
                       <h1 className="text-xl font-thin">
-                        3. Applicant's Footprint
+                        3. Applicant&apos;s Footprint
                       </h1>
                       <h1 className="text-xl font-thin">
-                        4. Applicant's Job Experience Details
+                        4. Applicant&apos;s Job Experience Details
                       </h1>
                       <h1 className="text-xl font-thin">
-                        5. Applicant's Education Certifications
+                        5. Applicant&apos;s Education Certifications
                       </h1>
                       <h1 className="text-xl font-thin">6. Trade Permission</h1>
                       <h1 className="text-xl font-thin">
@@ -162,7 +162,7 @@ const ApplyInstructions = async () => {
                         </span>
                         You will receive message, containing your login details.
                         With your credentials, you can now access the system
-                        portal. From there, you'll have the ability to hire
+                        portal. From there, you&apos;ll have the ability to hire
                         employees, manage your team, update your profile, and
                         perform various administrative tasks. We appreciate your
                         commitment to maintaining security standards, and we

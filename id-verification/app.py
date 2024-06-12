@@ -149,4 +149,4 @@ if not shutil.which("tesseract"):
     raise Exception("Tesseract is not installed or it's not in your PATH. See README file for more information.")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=8000)

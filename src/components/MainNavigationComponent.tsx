@@ -29,7 +29,7 @@ const MainNavigationComponentsItem = ({
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
-    }, 1000);
+    }, 180000);
 
     // Cleanup the interval on component unmount
     return () => clearInterval(interval);

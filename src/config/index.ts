@@ -57,9 +57,9 @@ export const AgentComponents: TSidebarItemsType[] = [
   },
   { name: "Employees", url: "Agentemployees", icon: Briefcase },
   { name: "Add Employee", url: "AddEmployee", icon: ShieldPlus },
-  {
-    name: "Chat",
-    url: "AgentChat",
-    icon: MessageSquareMore,
-  },
+  // {
+  //   name: "Chat",
+  //   url: "AgentChat",
+  //   icon: MessageSquareMore,
+  // },
 ];

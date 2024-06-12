@@ -818,14 +818,14 @@ const ApplicationMain = () => {
                   </div>
                   <div className="flex flex-col items-start">
                     <MultiFileDropzone
-                      value={agentLogoFile}
+                      value={employeeIdFile}
                       dropzoneOptions={{
                         maxFiles: 1,
                         maxSize: 1024 * 1024 * 1, // 1 MB
                       }}
-                      onChange={setAgentLogoFile}
+                      onChange={setEmployeeIdFile}
                       onFilesAdded={async (addedFiles) => {
-                        setAgentLogoFile([...agentLogoFile, ...addedFiles]);
+                        setEmployeeIdFile([...employeeIdFile, ...addedFiles]);
                       }}
                     />
                     <UploadButton

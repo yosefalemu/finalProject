@@ -101,7 +101,7 @@ const ApplicationDetail = ({
   });
   useEffect(() => {
     setValue("applicationId", params.applicationId);
-  }, []);
+  }, [params.applicationId, setValue]);
   const { mutate: rejectByScreener, isLoading: isLoaingForRejection } =
     trpc.screener.rejectByScreener.useMutation({
       onSuccess: () => {

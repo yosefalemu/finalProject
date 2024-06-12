@@ -58,7 +58,7 @@ const Profile = () => {
       setValue("kebele", userProfile.userFound.kebele || "");
       setValue("profile", userProfile.userFound.profile || "");
     }
-  }, [isLoading, userProfile]);
+  }, [isLoading, userProfile,setValue]);
 
   const personalInformation = [
     {

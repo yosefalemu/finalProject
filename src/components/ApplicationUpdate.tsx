@@ -1210,8 +1210,8 @@ const ApplicationUpdate = ({ applicationFound }: ApplicationFoundProps) => {
             <Image fill src={"/mainImages/logo.png"} alt="LOGO" />
           </div>
           <p className="text-xl text-customColor w-1/2 text-center">
-            Please refrain from submitting another application until we've had
-            the chance to process the one you've already submitted.
+            Please refrain from submitting another application until we&apos;ve had
+            the chance to process the one you&apos;ve already submitted.
           </p>
         </div>
       )}

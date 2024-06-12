@@ -26,6 +26,7 @@ type UserDataType = {
 const VerifyNationalId = () => {
   const router = useRouter();
   const [idCardImage, setIdCardImage] = useState<File | null>(null);
+  const [idCardImageUrl, setIdCardImageUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [verifySuccess, setVerifySuccess] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserDataType | null>(null);
@@ -65,10 +66,11 @@ const VerifyNationalId = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/upload_id_card",
+        "http://localhost:8000/upload_id_card",
         formData
       );
       setIdCardImage(file);
+      setIdCardImageUrl(URL.createObjectURL(file)); // Set the URL for the uploaded image
     } catch (error) {
       console.log("UPLOAD ID ERROR", error);
       if (axios.isAxiosError(error) && error.response) {
@@ -92,7 +94,7 @@ const VerifyNationalId = () => {
     setLoadingCompare(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/compare_faces",
+        "http://localhost:8000/compare_faces",
         formData
       );
       if (response.data.id_number) {
@@ -171,11 +173,11 @@ const VerifyNationalId = () => {
   return (
     <div className="h-full pt-36">
       <div className="h-[calc(100vh-9rem)] flex justify-center items-center pt-6">
-        <div className="flex-col justify-between max-w-screen-lg p-3 pb-6">
+        <div className="flex-col justify-between max-w-screen-xl p-3 pb-6">
           <h1 className="w-full text-2xl text-customColor text-center">
             Verify national Id
           </h1>
-          <div className="flex justify-center items-start gap-x-4 mt-4">
+          <div className="flex justify-center items-start gap-x-4 mt-4 w-full">
             <div className="flex flex-col gap-y-4 p-6 h-[700px] border border-gray-200 rounded-sm">
               {errorMessage && (
                 <p className="text-sm bg-red-600 text-white px-2 py-3 rounded-tr-md rounded-tl-sm error-border">
@@ -276,16 +278,24 @@ const VerifyNationalId = () => {
                 )}
               </div>
             </div>
-            <div className="h-[700px]">
+            <div className="h-[700px] flex-1">
               <div className="flex-col gap-y-44 h-full overflow-hidden">
-                <div className="h-[500px] w-[500px]">
-                  <div className="relative h-[500px] w-[500px] bg-green-400">
-                    <Image
-                      fill
-                      src={"/mainImages/face-verify.png"}
-                      alt="Face-recognition"
-                      className="object-cover"
-                    />
+                <div className="h-[500px]">
+                  <div className="relative h-[500px] w-[800px] bg-green-100">
+                    {idCardImageUrl ? (
+                      <img
+                        src={idCardImageUrl}
+                        alt="Uploaded ID card"
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <Image
+                        fill
+                        src={"/mainImages/face-verify.png"}
+                        alt="Face-recognition"
+                        className="object-contain"
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="flex-1 flex-col items-center justify-between py-4 text-customColor text-lg">
